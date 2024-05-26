@@ -396,3 +396,64 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Flutter/Dart/Pub related
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+.buildlog/
+.pub-cache/
+.pub/
+build/
+
+# Web related
+lib/generated_plugin_registrant.dart
+
+# macOS related
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Runner/GeneratedPluginRegistrant.*
+
+# Android related
+*.lock
+android/.gradle/
+android/app/build/
+android/app/.cxx/
+android/local.properties
+android/.idea/
+android/app/release/
+
+# Xcode related
+ios/Flutter/Flutter.podspec
+ios/Podfile.lock
+ios/Pods
+ios/Runner.xcworkspace
+ios/DerivedData/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+*.hmap
+*.ipa
+*.xcuserstate
+
+# Temporary files
+*.swp
+*.tmp
+*.temp
+*.DS_Store
+
+# Android Studio generated files and folders
+.idea/
+*.iml
+*.hprof
+
+# VSCode files
+.vscode/
+
+# Mac system files
+.DS_Store
