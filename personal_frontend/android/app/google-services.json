@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "438822396987",
+    "project_id": "personal-app-fe948",
+    "storage_bucket": "personal-app-fe948.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:438822396987:android:74ef657bb4aaa5a7c2681e",
+        "android_client_info": {
+          "package_name": "com.example.personal_frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-yLLnFjxy7wVZhJn5r2tk8kNZV4wchv4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
