@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class UserAccount extends StatelessWidget {
-  const UserAccount({super.key});
+class CurrentUserProfile extends StatelessWidget {
+  const CurrentUserProfile({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/pages/account.dart';
-import 'package:personal_frontend/pages/home.dart';
-import 'package:personal_frontend/pages/message.dart';
-import 'package:personal_frontend/pages/settings.dart';
+import 'package:personal_frontend/pages/profiles/current_user_profile.dart';
+import 'package:personal_frontend/pages/search_users.dart';
+import 'package:personal_frontend/pages/following_feed.dart';
+import 'package:personal_frontend/pages/add_post.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,23 +28,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   final List<Widget> _pages = [
-    const UserHome(),
-    const UserMessage(),
-    const UserSettings(),
-    const UserAccount(),
+    const FollowingPage(),
+    const SearchUsers(),
+    const AddPost(),
+    const CurrentUserProfile(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('App bar'),
+        title: Text("APP BAR"),
         actions: [
-          // logout button
-          IconButton(
-            onPressed: logout,
-            icon: Icon(Icons.logout),
-          ),
+          IconButton(onPressed: logout, icon: Icon(Icons.logout)),
         ],
       ),
       body: _pages[_selectedIndex],
@@ -58,12 +54,12 @@ class _HomePageState extends State<HomePage> {
             label: 'Home'
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.message), 
-            label: 'Message'
+            icon: Icon(Icons.search), 
+            label: 'Search'
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings), 
-            label: 'Settings'
+            icon: Icon(Icons.add), 
+            label: 'Add Post'
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person), 

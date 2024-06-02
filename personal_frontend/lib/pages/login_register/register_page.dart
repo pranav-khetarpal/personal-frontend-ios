@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_button.dart';
 import 'package:personal_frontend/components/my_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
+import 'package:personal_frontend/services/user_services.dart';
 
 class RegisterPage extends StatefulWidget {
   final void Function()? onTap;
@@ -22,10 +23,68 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController nameController = TextEditingController();
 
-  // login method
+  // object for calling UserService methods
+  UserServices userServices = UserServices();
+
+  // // register method
+  // void register() async {
+  //   // show loading circle
+  //   showDialog(
+  //     context: context, 
+  //     builder: (context) => const Center(
+  //       child: CircularProgressIndicator(),
+  //     ),
+  //   );
+
+  //   // make sure the passwords match
+  //   if (passwordController.text == confirmPasswordController.text) {
+  //     // try creating the user
+  //     try {
+  //       // create the user
+  //       UserCredential? userCredential = 
+  //           await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //             email: emailController.text, 
+  //             password: passwordController.text,
+  //           );
+        
+  //       // Create a user document and add to Firestore
+  //       await userServices.createUserDocument(
+  //         name: nameController.text,
+  //         email: emailController.text,
+  //         username: usernameController.text,
+  //         authToken: await FirebaseAuth.instance.currentUser!.getIdToken(),
+  //       );
+
+  //       // pop loading circle
+  //       if (context.mounted) Navigator.pop(context);
+
+  //     } on FirebaseAuthException catch (e) {
+  //       // pop loading circle
+  //       Navigator.pop(context);
+
+  //       // display error message to user
+  //       displayMessageToUser(e.code, context);
+  //     }
+  //   } else {
+  //     // pop loading circle
+  //     Navigator.pop(context);
+
+  //     // show error message to user
+  //     displayMessageToUser("Password's don't match", context);
+  //   }
+  // }
+
+  // register method
   void register() async {
-    // show loading circle
+    // Make sure the passwords match before proceeding
+    if (passwordController.text != confirmPasswordController.text) {
+      displayMessageToUser("Passwords don't match", context);
+      return;
+    }
+
+    // Show loading circle
     showDialog(
       context: context, 
       builder: (context) => const Center(
@@ -33,52 +92,55 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
     );
 
-    // make sure the passwords match
-    if (passwordController.text == confirmPasswordController.text) {
-      // try creating the user
-      try {
-        // create the user
-        UserCredential? userCredential = 
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-              email: emailController.text, 
-              password: passwordController.text,
-            );
-        
-        // // create a user and add to firestore
-        // createUserDocument(userCredential);
-        
-        // pop loading circle
-        if (context.mounted) Navigator.pop(context);
+    try {
+      // Create the user
+      UserCredential userCredential = 
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            email: emailController.text, 
+            password: passwordController.text,
+          );
 
-      } on FirebaseAuthException catch (e) {
-        // pop loading circle
-        Navigator.pop(context);
-
-        // display error message to user
-        displayMessageToUser(e.code, context);
+      // Retrieve the authentication token
+      String? authToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+      if (authToken == null) {
+        throw Exception("Failed to retrieve auth token");
       }
-    } else {
-      // pop loading circle
+
+      print("\n");
+      print("\n");
+      print(authToken);
+      print("\n");
+      print("\n");
+
+      // Create a user document in Firestore
+      await userServices.createUserDocument(
+        name: nameController.text,
+        email: emailController.text,
+        username: usernameController.text,
+        authToken: authToken,
+      );
+
+      // Pop the loading circle
+      if (context.mounted) Navigator.pop(context);
+
+      // Navigate to the next screen or show success message
+      displayMessageToUser("User registered successfully!", context);
+
+    } on FirebaseAuthException catch (e) {
+      // Pop the loading circle
       Navigator.pop(context);
 
-      // show error message to user
-      displayMessageToUser("Password's don't match", context);
+      // Display Firebase-specific error message
+      displayMessageToUser("Firebase Error: ${e.message}", context);
+
+    } catch (e) {
+      // Pop the loading circle
+      Navigator.pop(context);
+
+      // Display general error message
+      displayMessageToUser("Error: $e", context);
     }
   }
-
-  // // create a user document and collect them in firestore
-  // Future<void> createUserDocument(UserCredential? userCredential) async {
-  //   if (userCredential != null && userCredential.user != null) {
-  //     await FirebaseFirestore.instance
-  //         .collection("Users")
-  //         .doc(userCredential.user!.email)
-  //         .set({
-  //           'email': userCredential.user!.email,
-  //           'username': usernameController.text,
-  //         });
-  //   }
-  // }
-
 
   @override
   Widget build(BuildContext context) {
@@ -101,11 +163,20 @@ class _RegisterPageState extends State<RegisterPage> {
           
               // app name
               const Text(
-                "M I N I M A L",
+                "A P P    N A M E",
                 style: TextStyle(fontSize: 20,),
               ),
           
               const SizedBox(height: 50),
+
+              // name textfield
+              MyTextField(
+                hintText: "Name", 
+                obscureText: false, 
+                controller: nameController,
+              ),
+
+              const SizedBox(height: 10),
 
               // username textfield
               MyTextField(
