@@ -42,9 +42,17 @@ class _FollowingPageState extends State<FollowingPage> {
   Future<void> _fetchPosts() async {
     try {
       String? token = await FirebaseAuth.instance.currentUser?.getIdToken();
+      // String? token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
       if (token == null) {
         throw Exception('Failed to retrieve Firebase token');
       }
+
+      // makes sure to get rid of all new line characters
+      token = token.replaceAll('\n', '').trim();
+
+      print("\n");
+      print("Firebase token from following feed page: $token");
+      print("\n");
 
       List<PostModel> fetchedPosts = await postServices.fetchPosts(
         token: token,

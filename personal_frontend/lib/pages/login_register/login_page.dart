@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_button.dart';
 import 'package:personal_frontend/components/my_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
+import 'package:personal_frontend/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   
@@ -42,6 +43,14 @@ class _LoginPageState extends State<LoginPage> {
 
       // pop loading circle
       if (context.mounted) Navigator.pop(context);
+
+      // // Navigate to the desired page
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => HomePage(), // Replace DesiredPage with your desired destination page
+      //   )
+      // );
     }
 
     // display any errors

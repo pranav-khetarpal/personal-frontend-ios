@@ -106,12 +106,6 @@ class _RegisterPageState extends State<RegisterPage> {
         throw Exception("Failed to retrieve auth token");
       }
 
-      print("\n");
-      print("\n");
-      print(authToken);
-      print("\n");
-      print("\n");
-
       // Create a user document in Firestore
       await userServices.createUserDocument(
         name: nameController.text,

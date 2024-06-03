@@ -20,7 +20,9 @@ class IPAddressAndRoutes {
     'searchUsername': '/search/users?username=',
 
     'createPost': '/posts/create',
-    'fetchPosts': '/posts/fetch'
+    'fetchPosts': '/posts/fetch',
+
+    'logout': "/user/logout",
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key

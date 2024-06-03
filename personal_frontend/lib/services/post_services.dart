@@ -50,6 +50,7 @@ class PostServices {
     String? startAfterId,
   }) async {
     try {
+
       String url = IPAddressAndRoutes.getRoute('fetchPosts');
       
       // Construct the URL with query parameters for pagination
@@ -61,6 +62,10 @@ class PostServices {
         if (startAfterId != null) 'start_after': startAfterId,
       });
 
+      // get rid of all special characters
+      token = token.replaceAll(RegExp(r'\s'), '').trim();
+      print("Token being sent: $token");
+
       // Make an HTTP GET request to the server to fetch posts
       final response = await http.get(
         uri,
@@ -69,6 +74,9 @@ class PostServices {
           'Authorization': 'Bearer $token',
         },
       );
+
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
 
       // Check if the request was successful and process the response
       if (response.statusCode == 200) {
