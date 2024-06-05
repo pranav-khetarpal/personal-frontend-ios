@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:personal_frontend/components/my_textfield.dart';
 import 'package:personal_frontend/services/post_services.dart';
 
@@ -14,24 +13,14 @@ class _AddPostState extends State<AddPost> {
   final TextEditingController postController = TextEditingController();
   bool isLoading = false;
 
-  // object to use PostService methods
-  PostServices postServices = PostServices();
+  // object to use PostServices methods
+  final PostServices postServices = PostServices();
 
   Future<void> submitPost() async {
     try {
       setState(() {
         isLoading = true;
       });
-
-      // Retrieve the Firebase token of the current logged-in user
-      String? token = await FirebaseAuth.instance.currentUser?.getIdToken();
-
-      if (token == null) {
-        setState(() {
-          isLoading = false;
-        });
-        throw Exception('Failed to retrieve Firebase token');
-      }
 
       // Retrieve the text that the user inputted
       String content = postController.text;
@@ -46,9 +35,11 @@ class _AddPostState extends State<AddPost> {
       // Call the submitPost method to handle the submission of posts
       await postServices.submitPost(
         content: content,
-        token: token,
-        context: context,
       );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Post created successfully')),
+        );
 
       setState(() {
         isLoading = false;
@@ -61,6 +52,9 @@ class _AddPostState extends State<AddPost> {
         isLoading = false;
       });
       print('Error occurred while submitting post: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to submit post: $e'))
+      );
     }
   }
 
@@ -78,6 +72,8 @@ class _AddPostState extends State<AddPost> {
               controller: postController,
               hintText: 'What\'s on your mind?',
               obscureText: false,
+              maxLength: 280,
+              allowSpaces: true,
             ),
             const SizedBox(height: 16.0),
             isLoading

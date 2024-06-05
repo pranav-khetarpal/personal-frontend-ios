@@ -1,20 +1,23 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:personal_frontend/ip_address_and_routes.dart';
-import 'package:personal_frontend/pages/models/post_model.dart';
+import 'package:personal_frontend/models/post_model.dart';
+import 'package:personal_frontend/services/authorization_services.dart';
 
 class PostServices {
+  // object for calling AuthServices methods
+  final AuthServices authServices = AuthServices();
+
   // Handle the creation of a new post
   Future<void> submitPost({
     required String content,
-    required String token,
-    required BuildContext context,
   }) async {
     try {
+      // Retrieve the Firebase token of the current logged-in user
+      String token = await authServices.getIdToken();
+
       String url = IPAddressAndRoutes.getRoute('createPost');
 
-      // Send the post data to the backend
       final response = await http.post(
         Uri.parse(url),
         headers: {
@@ -25,10 +28,7 @@ class PostServices {
       );
 
       if (response.statusCode == 200) {
-        // If the post was successful, show a success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Post created successfully')),
-        );
+        print("User post submitted successfully");
       } else {
         // Handle unsuccessful post submission
         throw Exception('Failed to submit post: ${response.body}');
@@ -37,19 +37,17 @@ class PostServices {
     } catch (e) {
       // Handle any errors that occur during the submission process
       print('Error occurred while submitting post: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to submit post: $e'))
-      );
     }
   }
 
-  // Fetches a list of posts from a backend server, supporting pagination
+  // Fetches a list of posts, supporting pagination
   Future<List<PostModel>> fetchPosts({
-    required String token,
     int limit = 10,
     String? startAfterId,
   }) async {
     try {
+      // Retrieve the Firebase token of the current logged-in user
+      String token = await authServices.getIdToken();
 
       String url = IPAddressAndRoutes.getRoute('fetchPosts');
       
@@ -62,28 +60,23 @@ class PostServices {
         if (startAfterId != null) 'start_after': startAfterId,
       });
 
-      // get rid of all special characters
-      token = token.replaceAll(RegExp(r'\s'), '').trim();
-      print("Token being sent: $token");
+      // print("'n");
+      // print("Token being sent:");
+      // print(token);
 
-      // Make an HTTP GET request to the server to fetch posts
       final response = await http.get(
         uri,
         headers: {
-          // Include the authorization token in the request headers
           'Authorization': 'Bearer $token',
         },
       );
 
-      print("Response status: ${response.statusCode}");
-      print("Response body: ${response.body}");
-
-      // Check if the request was successful and process the response
       if (response.statusCode == 200) {
         // decode json response to list and return the list of PostModel objects
         List jsonResponse = jsonDecode(response.body);
         return jsonResponse.map((post) => PostModel.fromJson(post)).toList();
       } else {
+        // Handle unsuccessful post submission
         throw Exception('Failed to load posts');
       }
     } catch (e) {

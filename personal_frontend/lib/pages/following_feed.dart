@@ -1,7 +1,141 @@
+// import 'package:flutter/material.dart';
+// import 'package:personal_frontend/models/post_model.dart';
+// import 'package:personal_frontend/services/authorization_services.dart';
+// import 'package:personal_frontend/services/post_services.dart';
+
+// class FollowingPage extends StatefulWidget {
+//   const FollowingPage({super.key});
+
+//   @override
+//   State<FollowingPage> createState() => _FollowingPageState();
+// }
+
+// class _FollowingPageState extends State<FollowingPage> {
+//   // Variables for pagination
+//   final List<PostModel> posts = [];
+//   bool isLoading = false;
+//   bool hasMore = true;
+//   String? lastPostId;
+//   final int limit = 10;
+
+//   // object to use PostServices methods
+//   final PostServices postServices = PostServices();
+
+//   // object to user AuthServices methods
+//   final AuthServices authServices = AuthServices();
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     fetchInitialPosts(); // Fetch initial posts when the screen is loaded
+//   }
+
+//   // Fetch the initial posts
+//   Future<void> fetchInitialPosts() async {
+//     setState(() {
+//       isLoading = true;
+//     });
+//     await fetchPosts(); // Fetch posts from the server
+//     setState(() {
+//       isLoading = false;
+//     });
+//   }
+
+//   // Fetch posts with pagination
+//   Future<void> fetchPosts() async {
+//     try {
+//       // call the fetchPosts method to get a list of posts
+//       List<PostModel> fetchedPosts = await postServices.fetchPosts(
+//         limit: limit,
+//         startAfterId: lastPostId,
+//       );
+
+//       setState(() {
+//         posts.addAll(fetchedPosts);
+//         hasMore = fetchedPosts.length == limit;
+//         if (fetchedPosts.isNotEmpty) {
+//           lastPostId = fetchedPosts.last.id;
+//         }
+//       });
+//     } catch (e) {
+//       print(e);
+//     }
+//   }
+
+//   // Handle when the user refreshes the page
+//   Future<void> refreshPosts() async {
+//     // When the user refreshes the page and new posts were created, update the state to reflect the change
+//     setState(() {
+//       posts.clear();
+//       lastPostId = null;
+//       hasMore = true;
+//     });
+//     await fetchInitialPosts();
+//   }
+
+//   // Load more posts when the user scrolls to the bottom
+//   Future<void> loadMorePosts() async {
+//     if (hasMore && !isLoading) {
+//       setState(() {
+//         isLoading = true;
+//       });
+//       await fetchPosts();
+//       setState(() {
+//         isLoading = false;
+//       });
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Stock Social Media'),
+//       ),
+//       body: RefreshIndicator(
+//         onRefresh: refreshPosts,
+//         child: NotificationListener<ScrollNotification>(
+//           onNotification: (scrollNotification) {
+//             if (scrollNotification is ScrollEndNotification &&
+//                 scrollNotification.metrics.extentAfter == 0) {
+//               // Load more posts when the user scrolls to the bottom
+//               loadMorePosts();
+//               return true;
+//             }
+//             return false;
+//           },
+//           child: Column(
+//             children: [
+//               Expanded(
+//                 child: ListView.builder(
+//                   itemCount: posts.length,
+//                   itemBuilder: (context, index) {
+//                     PostModel post = posts[index];
+//                     return ListTile(
+//                       title: Text(post.content), // Display post content
+//                       subtitle: Text(post.timestamp.toLocal().toString()), // Display post timestamp
+//                     );
+//                   },
+//                 ),
+//               ),
+//               if (isLoading)
+//                 const Center(child: CircularProgressIndicator()),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:personal_frontend/pages/models/post_model.dart';
+import 'package:personal_frontend/components/my_post_tile.dart';
+import 'package:personal_frontend/models/post_model.dart';
+import 'package:personal_frontend/models/user_model.dart';
+import 'package:personal_frontend/pages/message.dart';
+import 'package:personal_frontend/services/authorization_services.dart';
 import 'package:personal_frontend/services/post_services.dart';
+import 'package:personal_frontend/services/user_services.dart';
 
 class FollowingPage extends StatefulWidget {
   const FollowingPage({super.key});
@@ -11,60 +145,66 @@ class FollowingPage extends StatefulWidget {
 }
 
 class _FollowingPageState extends State<FollowingPage> {
-  // Variables for pagination
-  final List<PostModel> _posts = [];
-  bool _isLoading = false;
-  bool _hasMore = true;
-  String? _lastPostId;
-  final int _limit = 10;
+  // Variables for pagination and display of posts
+  final List<PostModel> posts = [];
+  final Map<String, UserModel> users = {};
+  bool isLoading = false;
+  bool hasMore = true;
+  String? lastPostId;
+  final int limit = 10;
 
-  // object to use PostService methods
-  PostServices postServices = PostServices();
+  late DateTime feedLoadTime;     // variable to track the time that the feed was loaded
+
+  // Object to use PostServices methods
+  final PostServices postServices = PostServices();
+
+  // Object to use AuthServices methods
+  final AuthServices authServices = AuthServices();
+
+  // Object to use UserServices methods
+  final UserServices userServices = UserServices();
 
   @override
   void initState() {
     super.initState();
-    _fetchInitialPosts(); // Fetch initial posts when the screen is loaded
+    feedLoadTime = DateTime.now(); // Capture the current time
+    fetchInitialPosts(); // Fetch initial posts when the screen is loaded
   }
 
   // Fetch the initial posts
-  Future<void> _fetchInitialPosts() async {
+  Future<void> fetchInitialPosts() async {
     setState(() {
-      _isLoading = true;
+      isLoading = true;
     });
-    await _fetchPosts(); // Fetch posts from the server
+    await fetchPosts(); // Fetch posts from the server
     setState(() {
-      _isLoading = false;
+      isLoading = false;
     });
   }
 
   // Fetch posts with pagination
-  Future<void> _fetchPosts() async {
+  Future<void> fetchPosts() async {
     try {
-      String? token = await FirebaseAuth.instance.currentUser?.getIdToken();
-      // String? token = await FirebaseAuth.instance.currentUser?.getIdToken(true);
-      if (token == null) {
-        throw Exception('Failed to retrieve Firebase token');
-      }
 
-      // makes sure to get rid of all new line characters
-      token = token.replaceAll('\n', '').trim();
-
-      print("\n");
-      print("Firebase token from following feed page: $token");
-      print("\n");
-
+      // Call the fetchPosts method to get a list of posts
       List<PostModel> fetchedPosts = await postServices.fetchPosts(
-        token: token,
-        limit: _limit,
-        startAfterId: _lastPostId,
+        limit: limit,
+        startAfterId: lastPostId,
       );
 
+      // Fetch user information for each post
+      for (var post in fetchedPosts) {
+        if (!users.containsKey(post.userId)) {
+          UserModel user = await userServices.fetchUserProfile(post.userId);
+          users[post.userId] = user;
+        }
+      }
+
       setState(() {
-        _posts.addAll(fetchedPosts);
-        _hasMore = fetchedPosts.length == _limit;
+        posts.addAll(fetchedPosts);
+        hasMore = fetchedPosts.length == limit;
         if (fetchedPosts.isNotEmpty) {
-          _lastPostId = fetchedPosts.last.id;
+          lastPostId = fetchedPosts.last.id;
         }
       });
     } catch (e) {
@@ -73,25 +213,26 @@ class _FollowingPageState extends State<FollowingPage> {
   }
 
   // Handle when the user refreshes the page
-  Future<void> _refreshPosts() async {
-      // When the user refreshes the page and new posts were created, update the state to reflect the change
+  Future<void> refreshPosts() async {
+    // When the user refreshes the page and new posts were created, update the state to reflect the change
     setState(() {
-      _posts.clear();
-      _lastPostId = null;
-      _hasMore = true;
+      posts.clear();
+      users.clear();
+      lastPostId = null;
+      hasMore = true;
     });
-    await _fetchInitialPosts();
+    await fetchInitialPosts();
   }
 
   // Load more posts when the user scrolls to the bottom
-  Future<void> _loadMorePosts() async {
-    if (_hasMore && !_isLoading) {
+  Future<void> loadMorePosts() async {
+    if (hasMore && !isLoading) {
       setState(() {
-        _isLoading = true;
+        isLoading = true;
       });
-      await _fetchPosts();
+      await fetchPosts();
       setState(() {
-        _isLoading = false;
+        isLoading = false;
       });
     }
   }
@@ -100,16 +241,27 @@ class _FollowingPageState extends State<FollowingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stock Social Media'),
+        title: const Text("Stock Social Media"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.message), 
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const UserMessage()),
+              );
+            },
+          ),
+        ],
       ),
       body: RefreshIndicator(
-        onRefresh: _refreshPosts,
+        onRefresh: refreshPosts,
         child: NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
             if (scrollNotification is ScrollEndNotification &&
                 scrollNotification.metrics.extentAfter == 0) {
               // Load more posts when the user scrolls to the bottom
-              _loadMorePosts();
+              loadMorePosts();
               return true;
             }
             return false;
@@ -118,17 +270,17 @@ class _FollowingPageState extends State<FollowingPage> {
             children: [
               Expanded(
                 child: ListView.builder(
-                  itemCount: _posts.length,
+                  itemCount: posts.length,
                   itemBuilder: (context, index) {
-                    PostModel post = _posts[index];
-                    return ListTile(
-                      title: Text(post.content), // Display post content
-                      subtitle: Text(post.timestamp.toLocal().toString()), // Display post timestamp
-                    );
+                    PostModel post = posts[index];
+                    UserModel? user = users[post.userId];
+                    return user != null
+                        ? PostTile(post: post, user: user, feedLoadTime: feedLoadTime)
+                        : const Center(child: CircularProgressIndicator());
                   },
                 ),
               ),
-              if (_isLoading)
+              if (isLoading)
                 const Center(child: CircularProgressIndicator()),
             ],
           ),

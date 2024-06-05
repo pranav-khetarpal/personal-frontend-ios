@@ -22,7 +22,9 @@ class IPAddressAndRoutes {
     'createPost': '/posts/create',
     'fetchPosts': '/posts/fetch',
 
-    'logout': "/user/logout",
+    'logout': '/user/logout',
+
+    'deleteUser': '/user/delete',
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key
