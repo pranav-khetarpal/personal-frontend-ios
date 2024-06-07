@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/components/my_textfield.dart';
+import 'package:personal_frontend/components/my_expandable_textfield.dart';
 import 'package:personal_frontend/services/post_services.dart';
 
-class AddPost extends StatefulWidget {
+// class needed to ensure bottom navigation bar is present in sub pages
+class AddPost extends StatelessWidget {
   const AddPost({super.key});
 
   @override
-  State<AddPost> createState() => _AddPostState();
+  Widget build(BuildContext context) {
+    return Navigator(
+      onGenerateRoute: (routeSettings) {
+        return MaterialPageRoute(builder: (context) => const AddPostHome());
+      },
+    );
+  }
 }
 
-class _AddPostState extends State<AddPost> {
+class AddPostHome extends StatefulWidget {
+  const AddPostHome({super.key});
+
+  @override
+  State<AddPostHome> createState() => _AddPostState();
+}
+
+class _AddPostState extends State<AddPostHome> {
   final TextEditingController postController = TextEditingController();
   bool isLoading = false;
 
@@ -68,10 +82,9 @@ class _AddPostState extends State<AddPost> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            MyTextField(
+            MyExpandableTextfield(
               controller: postController,
               hintText: 'What\'s on your mind?',
-              obscureText: false,
               maxLength: 280,
               allowSpaces: true,
             ),

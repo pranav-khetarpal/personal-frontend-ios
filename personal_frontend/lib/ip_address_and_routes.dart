@@ -8,7 +8,6 @@ class IPAddressAndRoutes {
   // String of IP address on home wifi
   static String ip_address = 'http://10.0.0.32:8000';
 
-
   // map to make retrieving routes easier when needed
   static Map<String, String> routes = {
     'createUser': '/user/create',
@@ -25,6 +24,11 @@ class IPAddressAndRoutes {
     'logout': '/user/logout',
 
     'deleteUser': '/user/delete',
+
+    'searchTicker': '/search/stocks?ticker=',
+    'stockInfo': '/stock/info/',
+
+    'fetchUserPosts': '/posts/user',
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key

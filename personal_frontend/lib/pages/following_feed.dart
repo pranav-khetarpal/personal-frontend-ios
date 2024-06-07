@@ -3,14 +3,14 @@
 // import 'package:personal_frontend/services/authorization_services.dart';
 // import 'package:personal_frontend/services/post_services.dart';
 
-// class FollowingPage extends StatefulWidget {
-//   const FollowingPage({super.key});
+// class FollowingFeedHome extends StatefulWidget {
+//   const FollowingFeedHome({super.key});
 
 //   @override
-//   State<FollowingPage> createState() => _FollowingPageState();
+//   State<FollowingFeedHome> createState() => _FollowingFeedHomeState();
 // }
 
-// class _FollowingPageState extends State<FollowingPage> {
+// class _FollowingFeedHomeState extends State<FollowingFeedHome> {
 //   // Variables for pagination
 //   final List<PostModel> posts = [];
 //   bool isLoading = false;
@@ -137,14 +137,28 @@ import 'package:personal_frontend/services/authorization_services.dart';
 import 'package:personal_frontend/services/post_services.dart';
 import 'package:personal_frontend/services/user_services.dart';
 
-class FollowingPage extends StatefulWidget {
-  const FollowingPage({super.key});
+// class needed to ensure bottom navigation bar is present in sub pages
+class FollowingFeed extends StatelessWidget {
+  const FollowingFeed({super.key});
 
   @override
-  State<FollowingPage> createState() => _FollowingPageState();
+  Widget build(BuildContext context) {
+    return Navigator(
+      onGenerateRoute: (routeSettings) {
+        return MaterialPageRoute(builder: (context) => FollowingFeedHome());
+      },
+    );
+  }
 }
 
-class _FollowingPageState extends State<FollowingPage> {
+class FollowingFeedHome extends StatefulWidget {
+  const FollowingFeedHome({super.key});
+
+  @override
+  State<FollowingFeedHome> createState() => _FollowingFeedHomeState();
+}
+
+class _FollowingFeedHomeState extends State<FollowingFeedHome> {
   // Variables for pagination and display of posts
   final List<PostModel> posts = [];
   final Map<String, UserModel> users = {};

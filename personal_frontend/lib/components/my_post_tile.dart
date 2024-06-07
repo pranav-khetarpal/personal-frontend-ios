@@ -8,7 +8,12 @@ class PostTile extends StatelessWidget {
   final UserModel user;
   final DateTime feedLoadTime;
 
-  const PostTile({super.key, required this.post, required this.user, required this.feedLoadTime});
+  const PostTile({
+    super.key,
+    required this.post,
+    required this.user,
+    required this.feedLoadTime,
+  });
 
   // Helper method to format the elapsed time
   String getElapsedTime(DateTime postTime) {
@@ -27,69 +32,80 @@ class PostTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 2.0), // Spacing between each tile
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Placeholder for the user's profile picture
-              const CircleAvatar(
-                radius: 20,
-                child: Icon(Icons.person),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
+          Padding(
+            padding: const EdgeInsets.all(16.0), // Padding inside the tile
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Row for user's name, username, and timestamp
-                    Row(
-                      children: [
-                        // User's name and username
-                        Expanded(
-                          child: Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: '${user.name} ',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: '@${user.username}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        // Elapsed time
-                        Text(
-                          getElapsedTime(post.timestamp),
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ],
+                    // Placeholder for the user's profile picture
+                    const CircleAvatar(
+                      radius: 20,
+                      child: Icon(Icons.person),
                     ),
-                    const SizedBox(height: 8),
-                    // Post content
-                    Text(
-                      post.content,
-                      style: const TextStyle(fontSize: 16),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Row for user's name, username, and timestamp
+                          Row(
+                            children: [
+                              // User's name and username
+                              Expanded(
+                                child: Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: '${user.name} ',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '@${user.username}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 16,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              // Elapsed time
+                              Text(
+                                getElapsedTime(post.timestamp),
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          // Post content
+                          Text(
+                            post.content,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const Divider(),
+          Divider(
+            color: Theme.of(context).colorScheme.inversePrimary,
+            thickness: 1, // Adjust thickness as needed
+          ),
         ],
       ),
     );

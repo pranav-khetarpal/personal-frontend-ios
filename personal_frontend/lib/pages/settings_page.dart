@@ -44,15 +44,38 @@ class SettingsPage extends StatelessWidget {
               onPressed: () async {
                 // Perform account deletion logic here
                 try {
-                  // Call your backend API to delete the account
+                  // Call your backend API to delete the user document and posts
                   await userServices.deleteUser();
+                  
+                  // Delete the user's Firebase authentication record
+                  User? currentUser = FirebaseAuth.instance.currentUser;
+                  if (currentUser != null) {
+                    await currentUser.delete();
+                  }
+
                   // If successful, navigate to the login screen
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginOrRegister()), // Replace LoginPage with your actual login screen
                   );
+                } on FirebaseAuthException catch (e) {
+                  // Handle errors specifically related to Firebase authentication
+                  if (e.code == 'requires-recent-login') {
+                    // If the error is about requiring recent login, reauthenticate the user
+                    // and try deleting again. Here, you could show a dialog prompting the user
+                    // to re-authenticate.
+                    print("Error: ${e.message}");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Please re-authenticate and try again.")),
+                    );
+                  } else {
+                    print("Error deleting authentication record: ${e.message}");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Failed to delete account")),
+                    );
+                  }
                 } catch (e) {
-                  // Handle errors, such as displaying an error message
+                  // Handle other errors, such as those from userServices.deleteUser()
                   print("Error deleting account: $e");
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Failed to delete account")),

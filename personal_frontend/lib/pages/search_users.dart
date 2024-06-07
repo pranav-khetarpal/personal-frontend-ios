@@ -4,14 +4,14 @@
 // import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
 // import 'package:personal_frontend/services/user_services.dart';
 
-// class SearchUsers extends StatefulWidget {
-//   const SearchUsers({super.key});
+// class SearchUsersHome extends StatefulWidget {
+//   const SearchUsersHome({super.key});
 
 //   @override
-//   State<SearchUsers> createState() => _SearchUsersState();
+//   State<SearchUsersHome> createState() => _SearchUsersHomeState();
 // }
 
-// class _SearchUsersState extends State<SearchUsers> {
+// class _SearchUsersHomeState extends State<SearchUsersHome> {
 //   // List to hold the search results
 //   List<UserModel> searchResults = [];
 
@@ -22,10 +22,10 @@
 //   final UserServices userService = UserServices();
 
 //   // Method to search for users by username
-//   Future<void> searchUsers(String query) async {
+//   Future<void> SearchUsersHome(String query) async {
 //     try {
 //       int searchLimit = 10;
-//       final results = await userService.searchUsers(query, searchLimit);
+//       final results = await userService.SearchUsersHome(query, searchLimit);
 //       setState(() {
 //         searchResults = results;
 //       });
@@ -74,7 +74,7 @@
 //                 IconButton(
 //                   icon: const Icon(Icons.search),
 //                   onPressed: () {
-//                     searchUsers(searchController.text); // Call the search method when the button is pressed
+//                     SearchUsersHome(searchController.text); // Call the search method when the button is pressed
 //                   },
 //                 ),
 //               ],
@@ -101,20 +101,34 @@
 // }
 
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/components/my_textfield.dart';
 import 'package:personal_frontend/components/my_user_tile.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
 import 'package:personal_frontend/services/user_services.dart';
+import 'package:personal_frontend/components/my_rouded_textfield.dart';
 
-class SearchUsers extends StatefulWidget {
+// class needed to ensure bottom navigation bar is present in sub pages
+class SearchUsers extends StatelessWidget {
   const SearchUsers({super.key});
 
   @override
-  State<SearchUsers> createState() => _SearchUsersState();
+  Widget build(BuildContext context) {
+    return Navigator(
+      onGenerateRoute: (routeSettings) {
+        return MaterialPageRoute(builder: (context) => const SearchUsersHome());
+      },
+    );
+  }
 }
 
-class _SearchUsersState extends State<SearchUsers> {
+class SearchUsersHome extends StatefulWidget {
+  const SearchUsersHome({super.key});
+
+  @override
+  State<SearchUsersHome> createState() => _SearchUsersHomeState();
+}
+
+class _SearchUsersHomeState extends State<SearchUsersHome> {
   // List to hold the search results
   List<UserModel> searchResults = [];
 
@@ -125,7 +139,7 @@ class _SearchUsersState extends State<SearchUsers> {
   final UserServices userService = UserServices();
 
   // Method to search for users by username
-  Future<void> searchUsers(String query) async {
+  Future<void> SearchUsersHome(String query) async {
     try {
       int searchLimit = 10;
       final results = await userService.searchUsers(query, searchLimit);
@@ -166,9 +180,8 @@ class _SearchUsersState extends State<SearchUsers> {
               children: [
                 // Use the MyTextField component
                 Expanded(
-                  child: MyTextField(
+                  child: MyRoundedTextField(
                     hintText: 'Search by username',
-                    obscureText: false,
                     controller: searchController,
                     maxLength: 15,
                     allowSpaces: false,
@@ -179,7 +192,7 @@ class _SearchUsersState extends State<SearchUsers> {
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
-                    searchUsers(searchController.text); // Call the search method when the button is pressed
+                    SearchUsersHome(searchController.text); // Call the search method when the button is pressed
                   },
                 ),
               ],
@@ -204,4 +217,3 @@ class _SearchUsersState extends State<SearchUsers> {
     );
   }
 }
-

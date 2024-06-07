@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_button.dart';
-import 'package:personal_frontend/components/my_textfield.dart';
+import 'package:personal_frontend/components/my_square_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
 import 'package:personal_frontend/pages/home_page.dart';
@@ -120,7 +120,7 @@ class _RegisterPageState extends State<RegisterPage> {
         await userCredential.user?.delete();
         
         // Pop the loading circle
-        Navigator.pop(context);
+        if (mounted) Navigator.pop(context);
 
         // Display error message
         displayMessageToUser("User document creation failed. Please try again.", context);
@@ -128,7 +128,7 @@ class _RegisterPageState extends State<RegisterPage> {
       }
 
       // Pop the loading circle
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
 
       // Navigate to the home page only if registration is successful
       Navigator.pushReplacement(
@@ -138,14 +138,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
     } on FirebaseAuthException catch (e) {
       // Pop the loading circle
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
 
       // Display Firebase-specific error message
       displayMessageToUser("Firebase Error: ${e.message}", context);
 
     } catch (e) {
       // Pop the loading circle
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
 
       // Display general error message
       displayMessageToUser("Error: $e", context);
@@ -181,7 +181,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 50),
       
                 // name textfield
-                MyTextField(
+                MySquareTextField(
                   hintText: "Full Name", 
                   obscureText: false, 
                   controller: nameController,
@@ -192,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 10),
       
                 // username textfield
-                MyTextField(
+                MySquareTextField(
                   hintText: "@username", 
                   obscureText: false, 
                   controller: usernameController,
@@ -203,7 +203,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 10),
             
                 // email textfield
-                MyTextField(
+                MySquareTextField(
                   hintText: "Email", 
                   obscureText: false, 
                   controller: emailController,
@@ -214,7 +214,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 10),
             
                 // password textfield
-                 MyTextField(
+                 MySquareTextField(
                   hintText: "Password", 
                   obscureText: true, 
                   controller: passwordController,
@@ -225,7 +225,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 10),
       
                 // confirm password textfield
-                 MyTextField(
+                 MySquareTextField(
                   hintText: "Confirm Password", 
                   obscureText: true, 
                   controller: confirmPasswordController,
@@ -233,21 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   allowSpaces: false,
                 ),
       
-                const SizedBox(height: 10),
-            
-                // forgot password
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Forgot Password?",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.inversePrimary)
-                    ),
-                  ],
-                ),
-      
-                const SizedBox(height: 25),
+                const SizedBox(height: 35),
             
                 // register button
                 MyButton(
@@ -264,10 +250,11 @@ class _RegisterPageState extends State<RegisterPage> {
                     const Text("Already have an account? "),
                     GestureDetector(
                       onTap: widget.onTap,
-                      child: const Text(
+                      child: Text(
                         "Login Here",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ),
