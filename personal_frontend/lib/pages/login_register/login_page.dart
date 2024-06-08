@@ -4,11 +4,10 @@ import 'package:personal_frontend/components/my_button.dart';
 import 'package:personal_frontend/components/my_square_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
-import 'package:personal_frontend/pages/home_page.dart';
-import 'package:personal_frontend/services/user_services.dart';
+import 'package:personal_frontend/pages/main_scaffold.dart';
+import 'package:personal_frontend/services/user_interation_services.dart';
 
 class LoginPage extends StatefulWidget {
-  
   final void Function()? onTap;
 
   const LoginPage({
@@ -21,108 +20,70 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // text controllers
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  // object to use UserServices methods
-  final UserServices userServices = UserServices();
+  final UserInteractionServices userServices = UserInteractionServices();
 
-  // // login method
-  // void login() async {
-  //   // show loading circle
-  //   showDialog(
-  //     context: context, 
-  //     builder: (context) => const Center(
-  //       child: CircularProgressIndicator(),
-  //     ),
-  //   );
-
-  //   // try sign in
-  //   try {
-  //     await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //       email: emailController.text, 
-  //       password: passwordController.text,
-  //     );
-
-  //     // pop loading circle
-  //     Navigator.pop(context);
-
-  //     // // Navigate to the desired page
-  //     // Navigator.pushReplacement(
-  //     //   context,
-  //     //   MaterialPageRoute(
-  //     //     builder: (context) => HomePage(), // Replace DesiredPage with your desired destination page
-  //     //   )
-  //     // );
-  //   }
-
-  //   // display any errors
-  //   on FirebaseAuthException catch (e) {
-  //     // pop loading circle
-  //     Navigator.pop(context);
-
-  //     // display error message
-  //     displayMessageToUser(e.code, context);
-  //   }
-
-  // }
-
-void login() async {
-  // Show loading circle
-  showDialog(
-    context: context, 
-    builder: (context) => const Center(
-      child: CircularProgressIndicator(),
-    ),
-  );
-
-  // Try sign in
-  try {
-    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text, 
-      password: passwordController.text,
+  Future<void> login() async {
+    // Show loading circle
+    showDialog(
+      context: context,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(),
+      ),
     );
 
-    // Check if the user document exists in Firestore
-    final userDoc = await userServices.fetchUserProfile(userCredential.user!.uid);
-
-    if (userDoc != null) {
-      // Pop loading circle
-      if (mounted) Navigator.pop(context);
-
-      // Navigate to the home page
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(),
-        ),
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
       );
-    } else {
-      // User document doesn't exist, log out and show error
-      await FirebaseAuth.instance.signOut();
-      
-      // Pop loading circle
-      if (mounted) Navigator.pop(context);
 
-      // Display error message
-      displayMessageToUser("User profile not found. Please register.", context);
+      final userDoc = await userServices.fetchUserProfile(userCredential.user!.uid);
+
+      // Ensure the widget is still mounted before popping the loading circle
+      if (mounted) {
+        Navigator.pop(context);
+
+        if (userDoc != null) {
+          // Navigate to the home page
+          Future.microtask(() {
+            if (mounted) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MainScaffold(),
+                ),
+              );
+            }
+          });
+        } else {
+          // User document doesn't exist, log out and show error
+          await FirebaseAuth.instance.signOut();
+
+          // Display error message
+          displayMessageToUser("User profile not found. Please register.", context);
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      // Ensure the widget is still mounted before popping the loading circle
+      if (mounted) {
+        Navigator.pop(context);
+
+        // Display error message
+        displayMessageToUser(e.message ?? "Authentication failed", context);
+      }
+    } catch (e) {
+      // Ensure the widget is still mounted before popping the loading circle
+      if (mounted) {
+        Navigator.pop(context);
+
+        // Display general error message
+        displayMessageToUser("An error occurred. Please try again.", context);
+      }
     }
-  } on FirebaseAuthException catch (e) {
-    // Pop loading circle
-    if (mounted) Navigator.pop(context);
-
-    // Display error message
-    displayMessageToUser(e.message ?? "Authentication failed", context);
-  } catch (e) {
-    // Pop loading circle
-    if (mounted) Navigator.pop(context);
-
-    // Display general error message
-    displayMessageToUser("An error occurred. Please try again.", context);
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -141,61 +102,48 @@ void login() async {
                   size: 80,
                   color: Theme.of(context).colorScheme.inversePrimary,
                 ),
-            
                 const SizedBox(height: 25),
-            
                 // app name
                 const Text(
                   "A P P    N A M E",
-                  style: TextStyle(fontSize: 20,),
+                  style: TextStyle(fontSize: 20),
                 ),
-            
                 const SizedBox(height: 50),
-            
                 // email textfield
                 MySquareTextField(
-                  hintText: "Email", 
-                  obscureText: false, 
+                  hintText: "Email",
+                  obscureText: false,
                   controller: emailController,
                   maxLength: 254,
                   allowSpaces: false,
                 ),
-      
                 const SizedBox(height: 10),
-            
                 // password textfield
-                 MySquareTextField(
-                  hintText: "Password", 
-                  obscureText: true, 
+                MySquareTextField(
+                  hintText: "Password",
+                  obscureText: true,
                   controller: passwordController,
                   maxLength: 100,
                   allowSpaces: false,
                 ),
-      
                 const SizedBox(height: 10),
-            
                 // forgot password
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
                       "Forgot Password?",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary)
+                      style: TextStyle(color: Theme.of(context).colorScheme.primary),
                     ),
                   ],
                 ),
-      
                 const SizedBox(height: 25),
-            
                 // sign in button
                 MyButton(
-                  text: "Login", 
+                  text: "Login",
                   onTap: login,
                 ),
-      
                 const SizedBox(height: 25),
-            
                 // don't have an account? Register here
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

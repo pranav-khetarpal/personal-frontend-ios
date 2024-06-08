@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/components/my_rouded_textfield.dart';
+import 'package:personal_frontend/components/my_rounded_textfield.dart';
 import 'package:personal_frontend/models/stock_model.dart';
 import 'package:personal_frontend/pages/stock_detail_page.dart';
 import 'package:personal_frontend/services/stock_services.dart';
@@ -22,10 +22,10 @@ class SearchStocksHome extends StatefulWidget {
   const SearchStocksHome({super.key});
 
   @override
-  State<SearchStocksHome> createState() => _SearchStockHomeState();
+  State<SearchStocksHome> createState() => _SearchStocksHomeState();
 }
 
-class _SearchStockHomeState extends State<SearchStocksHome> {
+class _SearchStocksHomeState extends State<SearchStocksHome> {
   // List to hold the search results
   List<StockModel> searchResults = [];
 
@@ -35,8 +35,40 @@ class _SearchStockHomeState extends State<SearchStocksHome> {
   // Object to use StockServices methods
   final StockServices stockServices = StockServices();
 
+  // Index prices
+  Map<String, double> indexPrices = {
+    'SPY': 0.0,
+    'QQQ': 0.0,
+    'DIA': 0.0,
+    'IWM': 0.0,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch index prices when the widget initializes
+    fetchIndexPrices();
+  }
+
+  // Method to fetch index prices
+  Future<void> fetchIndexPrices() async {
+    try {
+      // Fetch the prices of the three indexes
+      Map<String, double> prices = await stockServices.fetchStockPrices(['SPY', 'QQQ', 'DIA', 'IWM']);
+      setState(() {
+        indexPrices = prices;
+      });
+    } catch (e) {
+      // Log the error and provide user feedback
+      print('Error fetching index prices: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching index prices: $e')),
+      );
+    }
+  }
+
   // Method to search for stocks by ticker
-  Future<void> SearchStocksHome(String query) async {
+  Future<void> searchStocksByTicker(String query) async {
     try {
       final results = await stockServices.searchStocks(query);
       setState(() {
@@ -70,7 +102,26 @@ class _SearchStockHomeState extends State<SearchStocksHome> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Index Prices Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: indexPrices.keys.map((ticker) {
+                return Column(
+                  children: [
+                    Text(
+                      ticker,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      '\$${indexPrices[ticker]?.toStringAsFixed(2) ?? '--'}',
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 16), // Add some space between the index prices and search input
             // Row to hold the search text field and search button
             Row(
               children: [
@@ -88,7 +139,8 @@ class _SearchStockHomeState extends State<SearchStocksHome> {
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
-                    SearchStocksHome(searchController.text); // Call the search method when the button is pressed
+                    searchStocksByTicker(
+                        searchController.text); // Call the search method when the button is pressed
                   },
                 ),
               ],
@@ -104,7 +156,8 @@ class _SearchStockHomeState extends State<SearchStocksHome> {
                     title: Text(stock.name),
                     subtitle: Text(stock.symbol),
                     trailing: Text('\$${stock.price.toStringAsFixed(2)}'),
-                    onTap: () => navigateToStockDetail(context, stock.symbol), // Navigate to the stock detail page on tap
+                    onTap: () =>
+                        navigateToStockDetail(context, stock.symbol), // Navigate to the stock detail page on tap
                   );
                 },
               ),

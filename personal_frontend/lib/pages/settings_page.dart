@@ -2,13 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/authorization/login_or_register.dart';
 import 'package:personal_frontend/services/authorization_services.dart';
-import 'package:personal_frontend/services/user_services.dart';
+import 'package:personal_frontend/services/user_account_services.dart';
 
 class SettingsPage extends StatelessWidget {
   SettingsPage({super.key});
 
-  // object to use UserService methods
-  final UserServices userServices = UserServices();
+  // object to user UserAccountServices methods
+  final UserAccountServices userAccountServices = UserAccountServices();
 
   // object to use AuthService methods
   final AuthServices authServices = AuthServices();
@@ -45,7 +45,7 @@ class SettingsPage extends StatelessWidget {
                 // Perform account deletion logic here
                 try {
                   // Call your backend API to delete the user document and posts
-                  await userServices.deleteUser();
+                  await userAccountServices.deleteUser();
                   
                   // Delete the user's Firebase authentication record
                   User? currentUser = FirebaseAuth.instance.currentUser;

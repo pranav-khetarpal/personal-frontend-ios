@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:personal_frontend/components/my_button.dart';
 import 'package:personal_frontend/components/my_expandable_textfield.dart';
 import 'package:personal_frontend/services/post_services.dart';
 
@@ -91,9 +92,9 @@ class _AddPostState extends State<AddPostHome> {
             const SizedBox(height: 16.0),
             isLoading
                 ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: submitPost,
-                    child: const Text('Post'),
+                : MyButton(
+                    onTap: submitPost,
+                    text: 'Post',
                   ),
           ],
         ),
@@ -101,4 +102,3 @@ class _AddPostState extends State<AddPostHome> {
     );
   }
 }
-

@@ -29,6 +29,8 @@ class IPAddressAndRoutes {
     'stockInfo': '/stock/info/',
 
     'fetchUserPosts': '/posts/user',
+
+    'stockPrices': '/stock/prices?',
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key

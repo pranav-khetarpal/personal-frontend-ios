@@ -1,99 +1,10 @@
-// import 'package:flutter/material.dart';
-// import 'package:personal_frontend/models/user_model.dart';
-// import 'package:personal_frontend/pages/settings_page.dart';
-// import 'package:personal_frontend/services/user_services.dart';
-
-// // class needed to ensure bottom navigation bar is present in sub pages
-// class CurrentUserProfile extends StatelessWidget {
-//   const CurrentUserProfile({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Navigator(
-//       onGenerateRoute: (routeSettings) {
-//         return MaterialPageRoute(builder: (context) => const CurrentUserProfileHome());
-//       },
-//     );
-//   }
-// }
-
-// class CurrentUserProfileHome extends StatefulWidget {
-//   const CurrentUserProfileHome({super.key});
-
-//   @override
-//   State<CurrentUserProfileHome> createState() => _CurrentUserProfileState();
-// }
-
-// class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
-//   late Future<UserModel> futureUser;
-//   UserModel? currentUser;
-//   bool isLoadingCurrentUser = true;
-
-//   // object for calling UserService methods
-//   final UserServices userServices = UserServices();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     // Fetch the current user's profile
-//     userServices.fetchCurrentUser().then((user) {
-//       setState(() {
-//         currentUser = user;
-//         isLoadingCurrentUser = false;
-//       });
-//     }).catchError((error) {
-//       setState(() {
-//         isLoadingCurrentUser = false;
-//       });
-//       // Handle error fetching current user
-//       print('Error fetching current user: $error');
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text("Stock Social Media"),
-//         actions: [
-//           IconButton(
-//             icon: const Icon(Icons.settings), 
-//             onPressed: () {
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(builder: (context) => SettingsPage()),
-//               );
-//             },
-//           ),
-//         ],
-//       ),
-//       body: isLoadingCurrentUser
-//           ? const Center(child: CircularProgressIndicator())
-//           : Padding(
-//               padding: const EdgeInsets.all(16.0),
-//               child: Center(
-//                 child: Column(
-//                   children: [
-//                     const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
-//                     const SizedBox(height: 16),
-//                     Text(currentUser!.name, style: const TextStyle(fontSize: 24)),
-//                     Text('@${currentUser!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
-//                     // Add any other information you want to display about the current user here
-//                   ],
-//                 ),
-//               ),
-//             ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_post_tile.dart';
 import 'package:personal_frontend/models/post_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/settings_page.dart';
 import 'package:personal_frontend/services/post_services.dart';
-import 'package:personal_frontend/services/user_services.dart';
+import 'package:personal_frontend/services/user_interation_services.dart';
 
 class CurrentUserProfile extends StatelessWidget {
   const CurrentUserProfile({super.key});
@@ -130,7 +41,7 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
 
   // objects for PostServices and UserServices methods
   final PostServices postServices = PostServices();
-  final UserServices userServices = UserServices();
+  final UserInteractionServices userServices = UserInteractionServices();
 
   @override
   void initState() {
@@ -223,10 +134,13 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.push(
-                context,
+              Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => SettingsPage()),
               );
+              // Navigator.push(
+              //   context, 
+              //   MaterialPageRoute(builder: (context) => SettingsPage()),
+              // );
             },
           ),
         ],

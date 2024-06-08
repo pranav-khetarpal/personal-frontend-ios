@@ -1,133 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:personal_frontend/models/post_model.dart';
-// import 'package:personal_frontend/services/authorization_services.dart';
-// import 'package:personal_frontend/services/post_services.dart';
-
-// class FollowingFeedHome extends StatefulWidget {
-//   const FollowingFeedHome({super.key});
-
-//   @override
-//   State<FollowingFeedHome> createState() => _FollowingFeedHomeState();
-// }
-
-// class _FollowingFeedHomeState extends State<FollowingFeedHome> {
-//   // Variables for pagination
-//   final List<PostModel> posts = [];
-//   bool isLoading = false;
-//   bool hasMore = true;
-//   String? lastPostId;
-//   final int limit = 10;
-
-//   // object to use PostServices methods
-//   final PostServices postServices = PostServices();
-
-//   // object to user AuthServices methods
-//   final AuthServices authServices = AuthServices();
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     fetchInitialPosts(); // Fetch initial posts when the screen is loaded
-//   }
-
-//   // Fetch the initial posts
-//   Future<void> fetchInitialPosts() async {
-//     setState(() {
-//       isLoading = true;
-//     });
-//     await fetchPosts(); // Fetch posts from the server
-//     setState(() {
-//       isLoading = false;
-//     });
-//   }
-
-//   // Fetch posts with pagination
-//   Future<void> fetchPosts() async {
-//     try {
-//       // call the fetchPosts method to get a list of posts
-//       List<PostModel> fetchedPosts = await postServices.fetchPosts(
-//         limit: limit,
-//         startAfterId: lastPostId,
-//       );
-
-//       setState(() {
-//         posts.addAll(fetchedPosts);
-//         hasMore = fetchedPosts.length == limit;
-//         if (fetchedPosts.isNotEmpty) {
-//           lastPostId = fetchedPosts.last.id;
-//         }
-//       });
-//     } catch (e) {
-//       print(e);
-//     }
-//   }
-
-//   // Handle when the user refreshes the page
-//   Future<void> refreshPosts() async {
-//     // When the user refreshes the page and new posts were created, update the state to reflect the change
-//     setState(() {
-//       posts.clear();
-//       lastPostId = null;
-//       hasMore = true;
-//     });
-//     await fetchInitialPosts();
-//   }
-
-//   // Load more posts when the user scrolls to the bottom
-//   Future<void> loadMorePosts() async {
-//     if (hasMore && !isLoading) {
-//       setState(() {
-//         isLoading = true;
-//       });
-//       await fetchPosts();
-//       setState(() {
-//         isLoading = false;
-//       });
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Stock Social Media'),
-//       ),
-//       body: RefreshIndicator(
-//         onRefresh: refreshPosts,
-//         child: NotificationListener<ScrollNotification>(
-//           onNotification: (scrollNotification) {
-//             if (scrollNotification is ScrollEndNotification &&
-//                 scrollNotification.metrics.extentAfter == 0) {
-//               // Load more posts when the user scrolls to the bottom
-//               loadMorePosts();
-//               return true;
-//             }
-//             return false;
-//           },
-//           child: Column(
-//             children: [
-//               Expanded(
-//                 child: ListView.builder(
-//                   itemCount: posts.length,
-//                   itemBuilder: (context, index) {
-//                     PostModel post = posts[index];
-//                     return ListTile(
-//                       title: Text(post.content), // Display post content
-//                       subtitle: Text(post.timestamp.toLocal().toString()), // Display post timestamp
-//                     );
-//                   },
-//                 ),
-//               ),
-//               if (isLoading)
-//                 const Center(child: CircularProgressIndicator()),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_post_tile.dart';
 import 'package:personal_frontend/models/post_model.dart';
@@ -135,9 +5,9 @@ import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/message.dart';
 import 'package:personal_frontend/services/authorization_services.dart';
 import 'package:personal_frontend/services/post_services.dart';
-import 'package:personal_frontend/services/user_services.dart';
+import 'package:personal_frontend/services/user_interation_services.dart';
 
-// class needed to ensure bottom navigation bar is present in sub pages
+// Class needed to ensure bottom navigation bar is present in subpages
 class FollowingFeed extends StatelessWidget {
   const FollowingFeed({super.key});
 
@@ -145,7 +15,7 @@ class FollowingFeed extends StatelessWidget {
   Widget build(BuildContext context) {
     return Navigator(
       onGenerateRoute: (routeSettings) {
-        return MaterialPageRoute(builder: (context) => FollowingFeedHome());
+        return MaterialPageRoute(builder: (context) => const FollowingFeedHome());
       },
     );
   }
@@ -167,7 +37,7 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
   String? lastPostId;
   final int limit = 10;
 
-  late DateTime feedLoadTime;     // variable to track the time that the feed was loaded
+  late DateTime feedLoadTime; // Variable to track the time that the feed was loaded
 
   // Object to use PostServices methods
   final PostServices postServices = PostServices();
@@ -176,7 +46,7 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
   final AuthServices authServices = AuthServices();
 
   // Object to use UserServices methods
-  final UserServices userServices = UserServices();
+  final UserInteractionServices userServices = UserInteractionServices();
 
   @override
   void initState() {
@@ -199,7 +69,6 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
   // Fetch posts with pagination
   Future<void> fetchPosts() async {
     try {
-
       // Call the fetchPosts method to get a list of posts
       List<PostModel> fetchedPosts = await postServices.fetchPosts(
         limit: limit,
@@ -258,7 +127,7 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
         title: const Text("Stock Social Media"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.message), 
+            icon: const Icon(Icons.message),
             onPressed: () {
               Navigator.push(
                 context,

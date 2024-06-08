@@ -5,10 +5,9 @@ class UserMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Hello',
-        style: TextStyle(fontSize: 50),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Message"),
       ),
     );
   }

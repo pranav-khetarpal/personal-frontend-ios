@@ -32,19 +32,6 @@ class StockServices {
     }
   }
 
-  // Future<Map<String, dynamic>> fetchStockInfo(String ticker) async {
-  //   String baseUrl = IPAddressAndRoutes.getRoute('stockInfo');
-  //   String url = '$baseUrl$ticker';
-
-  //   final response = await http.get(Uri.parse(url));
-
-  //   if (response.statusCode == 200) {
-  //     return jsonDecode(response.body);
-  //   } else {
-  //     throw Exception('Failed to load stock info');
-  //   }
-  // }
-
   // Method designed to fetch stock information for a given ticker
   Future<Map<String, dynamic>> fetchStockInfo(String ticker) async {
     try {
@@ -70,6 +57,34 @@ class StockServices {
       // Handle any other types of errors
       print('Unexpected error: $e');
       throw Exception('An unexpected error occurred. Please try again.');
+    }
+  }
+
+  // Method to fetch the stock prices for a list of given tickers
+  Future<Map<String, double>> fetchStockPrices(List<String> tickers) async {
+    try {
+      // Construct the URL with query parameters
+      String baseUrl = IPAddressAndRoutes.getRoute('stockPrices');
+      String tickersParam = tickers.map((ticker) => 'tickers=$ticker').join('&');
+      String url = '$baseUrl$tickersParam';
+
+      // Make a GET request
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Parse and return the response body
+        print(Map<String, double>.from(jsonDecode(response.body)));
+        return Map<String, double>.from(jsonDecode(response.body));
+      } else {
+        // Handle error response
+        throw Exception('Failed to fetch stock prices: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle other errors
+      throw Exception('Failed to fetch stock prices: $e');
     }
   }
 }

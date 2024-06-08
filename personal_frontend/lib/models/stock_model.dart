@@ -15,4 +15,13 @@ class StockModel {
       price: json['price'].toDouble(),
     );
   }
+
+  // Method to convert a Stock instance to a JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'symbol': symbol,
+      'name': name,
+      'price': price,
+    };
+  }
 }

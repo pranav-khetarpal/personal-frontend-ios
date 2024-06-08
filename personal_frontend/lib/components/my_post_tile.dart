@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/models/post_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
+import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
 
-// Custom widget to display each post
 class PostTile extends StatelessWidget {
   final PostModel post;
   final UserModel user;
   final DateTime feedLoadTime;
 
   const PostTile({
-    super.key,
+    Key? key,
     required this.post,
     required this.user,
     required this.feedLoadTime,
-  });
+  }) : super(key: key);
 
   // Helper method to format the elapsed time
   String getElapsedTime(DateTime postTime) {
@@ -32,61 +32,83 @@ class PostTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0), // Spacing between each tile
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0), // Padding inside the tile
+            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Placeholder for the user's profile picture
-                    const CircleAvatar(
-                      radius: 20,
-                      child: Icon(Icons.person),
+                    // Wrap the CircleAvatar with GestureDetector
+                    GestureDetector(
+                      onTap: () {
+                        // Navigate to the user's profile page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OtherUserProfile(userID: user.id),
+                          ),
+                        );
+                      },
+                      child: const CircleAvatar(
+                        radius: 20,
+                        child: Icon(Icons.person),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Row for user's name, username, and timestamp
-                          Row(
-                            children: [
-                              // User's name and username
-                              Expanded(
-                                child: Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: '${user.name} ',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                          // Wrap the user's name and username with GestureDetector
+                          GestureDetector(
+                            onTap: () {
+                              // Navigate to the user's profile page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OtherUserProfile(userID: user.id),
+                                ),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                // User's name and username
+                                Expanded(
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '${user.name} ',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
                                         ),
-                                      ),
-                                      TextSpan(
-                                        text: '@${user.username}',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 16,
-                                          color: Colors.grey,
+                                        TextSpan(
+                                          text: '@${user.username}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              // Elapsed time
-                              Text(
-                                getElapsedTime(post.timestamp),
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
+                                // Elapsed time
+                                Text(
+                                  getElapsedTime(post.timestamp),
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 8),
                           // Post content
@@ -104,10 +126,11 @@ class PostTile extends StatelessWidget {
           ),
           Divider(
             color: Theme.of(context).colorScheme.inversePrimary,
-            thickness: 1, // Adjust thickness as needed
+            thickness: 1,
           ),
         ],
       ),
     );
   }
 }
+

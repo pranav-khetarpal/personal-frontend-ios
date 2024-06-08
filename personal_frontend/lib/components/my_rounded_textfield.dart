@@ -32,7 +32,7 @@ class MyRoundedTextField extends StatelessWidget {
       controller: controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(25),
         ),
         hintText: hintText,
         counterText: '', // Hide the default counter text
