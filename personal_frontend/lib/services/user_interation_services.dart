@@ -131,6 +131,37 @@ class UserInteractionServices {
     }
   }
 
+  // Handle the unfollow button press
+  Future<void> unfollowUser(String userIDToUnfollow, UserModel currentUser) async {
+    // Retrieve the Firebase token of the current logged-in user
+    String token = await authServices.getIdToken();
+
+    final String url = IPAddressAndRoutes.getRoute('unfollowOtherUser');
+
+    try {
+      // Send HTTP POST request to constructed URL with the token for authorization
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'userIdToUnfollow': userIDToUnfollow}),
+      );
+
+      // Handling whether the response is valid from the status code
+      if (response.statusCode == 200) {
+        // Update the current logged-in user's following list
+        currentUser.following.remove(userIDToUnfollow);
+      } else {
+        throw Exception('Failed to unfollow user: ${response.statusCode} ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      // Catch any errors resulting from the HTTP request
+      throw Exception('An error occurred: $e');
+    }
+  }
+
   // Method to search for users by username with limit
   Future<List<UserModel>> searchUsers(String query, int limit) async {
     // If the search query is empty, return an empty list

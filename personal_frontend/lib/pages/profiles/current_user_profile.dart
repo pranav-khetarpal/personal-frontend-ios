@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_post_tile.dart';
 import 'package:personal_frontend/models/post_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
-import 'package:personal_frontend/pages/settings_page.dart';
+import 'package:personal_frontend/pages/account_management/edit_profile_page.dart';
+import 'package:personal_frontend/pages/account_management/settings_page.dart';
 import 'package:personal_frontend/services/post_services.dart';
 import 'package:personal_frontend/services/user_interation_services.dart';
 
@@ -49,7 +50,7 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
     fetchCurrentUser(); // Fetch the current user's profile
   }
 
-  // Fetch the current user's profile
+  // Fetch the current user's profile and posts
   Future<void> fetchCurrentUser() async {
     try {
       UserModel user = await userServices.fetchCurrentUser();
@@ -168,9 +169,26 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                           children: [
                             const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
                             const SizedBox(height: 16),
+
                             Text(currentUser!.name, style: const TextStyle(fontSize: 24)),
                             Text('@${currentUser!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
-                            // Add any other information you want to display about the current user here
+
+                            const SizedBox(height: 16,),
+
+                            // Button to allow the user to edit their profile information
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                                    );
+                                  },
+                                  child: const Text("Edit Profile"),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),

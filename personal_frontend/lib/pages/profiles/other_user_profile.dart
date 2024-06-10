@@ -18,20 +18,23 @@ class OtherUserProfile extends StatefulWidget {
 }
 
 class _OtherUserProfileState extends State<OtherUserProfile> {
+  // variables for fetching the profile information for the user in question
   late Future<UserModel> futureUser;
   UserModel? userProfile;
   UserModel? currentUser;
   bool isLoadingUserProfile = true;
   bool isLoadingCurrentUser = true;
 
+  // variables for loading the user's posts
   final List<PostModel> posts = [];
   bool isLoadingPosts = false;
   bool hasMorePosts = true;
   String? lastPostId;
   final int postLimit = 10;
 
+  // objects to access method in PostServices and UserInteractionServices classes
   final PostServices postServices = PostServices();
-  final UserInteractionServices userServices = UserInteractionServices();
+  final UserInteractionServices userInteractionServices = UserInteractionServices();
 
   @override
   void initState() {
@@ -44,7 +47,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
   // Fetch the profile of the other user based on the provided userID
   Future<void> fetchUserProfile() async {
     try {
-      UserModel user = await userServices.fetchUserProfile(widget.userID);
+      UserModel user = await userInteractionServices.fetchUserProfile(widget.userID);
       setState(() {
         userProfile = user;
         isLoadingUserProfile = false;
@@ -61,7 +64,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
   // Fetch the current user's profile
   Future<void> fetchCurrentUser() async {
     try {
-      UserModel user = await userServices.fetchCurrentUser();
+      UserModel user = await userInteractionServices.fetchCurrentUser();
       setState(() {
         currentUser = user;
         isLoadingCurrentUser = false;
@@ -138,7 +141,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
     
     try {
       // Calling the followUser method to add a new user to the following list and then update the state
-      await userServices.followUser(userIdToFollow, currentUser!);
+      await userInteractionServices.followUser(userIdToFollow, currentUser!);
       setState(() {
         currentUser!.following.add(userIdToFollow);
       });
@@ -149,6 +152,37 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
       // Show an error message to the user
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error following user: $e')),
+      );
+    }
+  }
+
+  // Handle the follow button press
+  Future<void> toggleFollowUser(String userIdToFollow) async {
+    if (currentUser == null) {
+      return;
+    }
+
+    try {
+      if (currentUser!.following.contains(userIdToFollow)) {
+        // If the user is already following, unfollow them
+        await userInteractionServices.unfollowUser(userIdToFollow, currentUser!);
+        setState(() {
+          currentUser!.following.remove(userIdToFollow);
+        });
+      } else {
+        // If the user is not following, follow them
+        await userInteractionServices.followUser(userIdToFollow, currentUser!);
+        setState(() {
+          currentUser!.following.add(userIdToFollow);
+        });
+      }
+    } catch (e) {
+      // Log the error
+      print('Error toggling follow status: $e');
+
+      // Show an error message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error toggling follow status: $e')),
       );
     }
   }
@@ -185,12 +219,18 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                             Text(userProfile!.name, style: const TextStyle(fontSize: 24)),
                             Text('@${userProfile!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
                             const SizedBox(height: 16),
+
+                            // button to allow users to follow and unfollow the user in question
                             ElevatedButton(
-                              onPressed: currentUser!.following.contains(userProfile!.id)
-                                  ? null
-                                  : () => followUser(userProfile!.id),
+                              onPressed: () => toggleFollowUser(userProfile!.id),
                               child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
                             ),
+                            // ElevatedButton(
+                            //   onPressed: currentUser!.following.contains(userProfile!.id)
+                            //       ? null
+                            //       : () => followUser(userProfile!.id),
+                            //   child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
+                            // ),
                             // Add any other information you want to display about the user here
                           ],
                         ),

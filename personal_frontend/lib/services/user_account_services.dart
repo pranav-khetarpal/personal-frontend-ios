@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:personal_frontend/ip_address_and_routes.dart';
 import 'package:http/http.dart' as http;
+import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/services/authorization_services.dart';
 
 class UserAccountServices {
@@ -51,6 +52,28 @@ class UserAccountServices {
     }
   }
 
+
+  // Check if the username is available
+  Future<bool> isUsernameAvailable(String username) async {
+    String url = IPAddressAndRoutes.getRoute('checkUsernameAvailability');
+
+    var response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'username': username}),
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      return data['available'];
+    } else {
+      throw Exception('Failed to check username availability');
+    }
+  }
+
+
   // Method to delete all of a user's content, including their posts
   Future<void> deleteUser() async {
     try {
@@ -86,4 +109,36 @@ class UserAccountServices {
       // throw Exception('Failed to delete user: $e');
     }
   }
+
+  // Method to update the profile information of a user
+  Future<bool> updateUserProfile(UserModel updatedUser) async {
+    try {
+      // Retrieve the Firebase token of the current logged-in user
+      String token = await authServices.getIdToken();
+
+      String url = IPAddressAndRoutes.getRoute('updateUser');
+
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include the token in the headers
+        },
+        body: jsonEncode(updatedUser.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        // Handle different status codes if necessary
+        print('Failed to update profile: ${response.statusCode} ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the HTTP request
+      print('Error updating profile: $e');
+      return false;
+    }
+  }
+
 }

@@ -31,6 +31,12 @@ class IPAddressAndRoutes {
     'fetchUserPosts': '/posts/user',
 
     'stockPrices': '/stock/prices?',
+
+    'updateUser': '/user/update',
+
+    'checkUsernameAvailability': '/user/usernameAvailability',
+
+    'unfollowOtherUser': '/user/unfollow',
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key
