@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/authorization/login_or_register.dart';
+import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/services/authorization_services.dart';
 import 'package:personal_frontend/services/user_account_services.dart';
 
@@ -65,21 +66,19 @@ class SettingsPage extends StatelessWidget {
                     // and try deleting again. Here, you could show a dialog prompting the user
                     // to re-authenticate.
                     print("Error: ${e.message}");
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Please re-authenticate and try again.")),
-                    );
+                    displayMessageToUser("Please re-authenticate and try again.", context);
+
                   } else {
+
                     print("Error deleting authentication record: ${e.message}");
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Failed to delete account")),
-                    );
+                    displayMessageToUser("Failed to delete account", context);
+
                   }
                 } catch (e) {
                   // Handle other errors, such as those from userServices.deleteUser()
                   print("Error deleting account: $e");
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Failed to delete account")),
-                  );
+                  displayMessageToUser("Failed to delete account", context);
+                  
                 }
               },
               child: const Text(

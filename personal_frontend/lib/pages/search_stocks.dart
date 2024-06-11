@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_rounded_textfield.dart';
+import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/stock_model.dart';
 import 'package:personal_frontend/pages/stock_detail_page.dart';
 import 'package:personal_frontend/services/stock_services.dart';
@@ -10,11 +11,7 @@ class SearchStocks extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      onGenerateRoute: (routeSettings) {
-        return MaterialPageRoute(builder: (context) => const SearchStocksHome());
-      },
-    );
+    return const SearchStocksHome();
   }
 }
 
@@ -61,9 +58,7 @@ class _SearchStocksHomeState extends State<SearchStocksHome> {
     } catch (e) {
       // Log the error and provide user feedback
       print('Error fetching index prices: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching index prices: $e')),
-      );
+      displayMessageToUser('Error fetching index prices: $e', context);
     }
   }
 
@@ -77,16 +72,13 @@ class _SearchStocksHomeState extends State<SearchStocksHome> {
     } catch (e) {
       // Log the error and provide user feedback
       print('Error searching stocks: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error searching stocks: $e')),
-      );
+      displayMessageToUser('Error searching stocks: $e', context);
     }
   }
 
   // Method to navigate to the stock detail page
   void navigateToStockDetail(BuildContext context, String symbol) {
-    Navigator.push(
-      context,
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => StockDetailPage(symbol: symbol), // Pass the stock symbol to the detail page
       ),
@@ -100,7 +92,7 @@ class _SearchStocksHomeState extends State<SearchStocksHome> {
         title: const Text('Search Stocks'), // Title of the search page
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(25.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -112,7 +104,7 @@ class _SearchStocksHomeState extends State<SearchStocksHome> {
                   children: [
                     Text(
                       ticker,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
                       '\$${indexPrices[ticker]?.toStringAsFixed(2) ?? '--'}',
@@ -139,8 +131,9 @@ class _SearchStocksHomeState extends State<SearchStocksHome> {
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () {
-                    searchStocksByTicker(
-                        searchController.text); // Call the search method when the button is pressed
+                    if (searchController.text.isNotEmpty) {
+                      searchStocksByTicker(searchController.text); // Call the search method when the button is pressed
+                    }
                   },
                 ),
               ],
@@ -156,8 +149,7 @@ class _SearchStocksHomeState extends State<SearchStocksHome> {
                     title: Text(stock.name),
                     subtitle: Text(stock.symbol),
                     trailing: Text('\$${stock.price.toStringAsFixed(2)}'),
-                    onTap: () =>
-                        navigateToStockDetail(context, stock.symbol), // Navigate to the stock detail page on tap
+                    onTap: () => navigateToStockDetail(context, stock.symbol), // Navigate to the stock detail page on tap
                   );
                 },
               ),

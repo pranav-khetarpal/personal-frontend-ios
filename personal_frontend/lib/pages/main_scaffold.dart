@@ -82,9 +82,32 @@ class _MainScaffoldState extends State<MainScaffold> {
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
+            if (_selectedIndex == index) {
+              final navigatorState = _navigatorKeys[index].currentState;
+              navigatorState!.popUntil((route) {
+                print("Route isFirst: ${route.isFirst} for index $index");
+                return route.isFirst;
+              });
+            } else {
+              setState(() {
+                _selectedIndex = index;
+              });
+            }
+
+            // // if statement handles the case that the navigation icon from the sub page of the main page is selected
+            // if (_selectedIndex == index) {
+            //   _navigatorKeys[index].currentState!.popUntil((route) => route.isCurrent);
+            // } else {
+            //   // otherwise, the user is on a different tab than the icon selected in the bottom navigation bar
+            //   setState(() {
+            //     _selectedIndex = index;
+            //   });
+            // }
+
+            // setState(() {
+            //     _selectedIndex = index;
+            //   });
+
           },
           type: BottomNavigationBarType.fixed,
           items: const [

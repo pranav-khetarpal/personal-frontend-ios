@@ -28,6 +28,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // text controllers
   final TextEditingController nameController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
+  final TextEditingController bioController = TextEditingController();
 
   @override
   void initState() {
@@ -45,6 +46,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         // Update text controllers with fetched user data
         nameController.text = currentUser?.name ?? '';
         usernameController.text = currentUser?.username ?? '';
+        bioController.text = currentUser?.bio ?? '';
       });
     } catch (error) {
       setState(() {
@@ -58,11 +60,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // update the current user's information
   void updateProfile() async {
     try {
-      // Check if the username is available
-      bool isAvailable = await userAccountServices.isUsernameAvailable(usernameController.text);
-      if (!isAvailable) {
-        displayMessageToUser("Username is not available", context);
-        return;
+      // // Check if the username is available
+      // bool isAvailable = await userAccountServices.isUsernameAvailable(usernameController.text);
+      // if (!isAvailable) {
+      //   displayMessageToUser("Username is not available", context);
+      //   return;
+      // }
+
+      // Check if the username has been changed
+      bool usernameChanged = currentUser!.username != usernameController.text;
+
+      // If the username has been changed, then check if it's available
+      if (usernameChanged) {
+        bool isAvailable = await userAccountServices.isUsernameAvailable(usernameController.text);
+        if (!isAvailable) {
+          displayMessageToUser("Username is not available", context);
+          return;
+        }
       }
 
       // Create a new user model with the updated data
@@ -70,6 +84,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         id: currentUser!.id,
         name: nameController.text, // the user's inputted name
         username: usernameController.text, // the user's inputted username
+        bio: bioController.text, // the user's inputted bio
         following: currentUser!.following,
       );
 
@@ -121,6 +136,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: usernameController,
                     maxLength: 50,
                     allowSpaces: false,
+                  ),
+                  	
+                  const SizedBox(height: 10),
+                  
+                  MySquareTextField(
+                    hintText: "Bio",
+                    obscureText: false,
+                    controller: bioController,
+                    maxLength: 160,  // Twitter-like bio length
+                    allowSpaces: true,
+              
                   ),
             
                   const SizedBox(height: 35),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_button.dart';
 import 'package:personal_frontend/components/my_expandable_textfield.dart';
+import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/services/post_services.dart';
 
 // class needed to ensure bottom navigation bar is present in sub pages
@@ -9,11 +10,7 @@ class AddPost extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      onGenerateRoute: (routeSettings) {
-        return MaterialPageRoute(builder: (context) => const AddPostHome());
-      },
-    );
+    return const AddPostHome();
   }
 }
 
@@ -52,9 +49,7 @@ class _AddPostState extends State<AddPostHome> {
         content: content,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Post created successfully')),
-        );
+      displayMessageToUser('Post created successfully', context);
 
       setState(() {
         isLoading = false;
@@ -66,10 +61,10 @@ class _AddPostState extends State<AddPostHome> {
       setState(() {
         isLoading = false;
       });
+      
       print('Error occurred while submitting post: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to submit post: $e'))
-      );
+
+      displayMessageToUser('Failed to submit post: $e', context);
     }
   }
 
@@ -80,7 +75,7 @@ class _AddPostState extends State<AddPostHome> {
         title: const Text('Create Post'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(25.0),
         child: Column(
           children: [
             MyExpandableTextfield(

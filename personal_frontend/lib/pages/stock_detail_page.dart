@@ -1,5 +1,6 @@
 // frontend/lib/pages/stock_detail_page.dart
 import 'package:flutter/material.dart';
+import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/services/stock_services.dart';
 
 class StockDetailPage extends StatefulWidget {
@@ -34,9 +35,8 @@ class _StockDetailPageState extends State<StockDetailPage> {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load stock info: $e')),
-      );
+
+      displayMessageToUser('Failed to load stock info: $e', context);
     }
   }
 

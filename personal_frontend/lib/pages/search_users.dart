@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_user_tile.dart';
+import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
 import 'package:personal_frontend/services/user_interation_services.dart';
@@ -11,11 +12,7 @@ class SearchUsers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      onGenerateRoute: (routeSettings) {
-        return MaterialPageRoute(builder: (context) => const SearchUsersHome());
-      },
-    );
+    return const SearchUsersHome();
   }
 }
 
@@ -47,9 +44,7 @@ class _SearchUsersHomeState extends State<SearchUsersHome> {
     } catch (e) {
       // Log the error and provide user feedback
       print('Error searching users: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error searching users: $e')),
-      );
+      displayMessageToUser('Error searching users: $e', context);
     }
   }
 
@@ -69,7 +64,7 @@ class _SearchUsersHomeState extends State<SearchUsersHome> {
         title: const Text('Search Users'), // Title of the search page
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(25.0),
         child: Column(
           children: [
             // Row to hold the search text field and search button

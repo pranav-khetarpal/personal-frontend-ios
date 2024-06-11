@@ -303,6 +303,9 @@ class _RegisterPageState extends State<RegisterPage> {
         name: nameController.text,
         email: emailController.text,
         username: usernameController.text,
+
+        // INITIALLY, PASS THE BIO AS AN EMPTY STRING WHEN CREATING THE NEW USER
+        bio: "",
       );
 
       // Pop the loading circle

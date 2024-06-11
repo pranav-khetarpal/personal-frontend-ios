@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_post_tile.dart';
+import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/post_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/services/post_services.dart';
@@ -150,9 +151,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
       print('Error following user: $e');
 
       // Show an error message to the user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error following user: $e')),
-      );
+      displayMessageToUser('Error following user: $e', context);
     }
   }
 
@@ -181,14 +180,16 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
       print('Error toggling follow status: $e');
 
       // Show an error message to the user
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error toggling follow status: $e')),
-      );
+      displayMessageToUser('Error toggling follow status: $e', context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+
+    // Check if the current user is viewing their own profile
+    bool isCurrentUserProfile = userProfile?.id == currentUser?.id;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Profile'),
@@ -207,47 +208,62 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                   }
                   return false;
                 },
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
-                            const SizedBox(height: 16),
-                            Text(userProfile!.name, style: const TextStyle(fontSize: 24)),
-                            Text('@${userProfile!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
-                            const SizedBox(height: 16),
-
-                            // button to allow users to follow and unfollow the user in question
-                            ElevatedButton(
-                              onPressed: () => toggleFollowUser(userProfile!.id),
-                              child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
-                            ),
-                            // ElevatedButton(
-                            //   onPressed: currentUser!.following.contains(userProfile!.id)
-                            //       ? null
-                            //       : () => followUser(userProfile!.id),
-                            //   child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
-                            // ),
-                            // Add any other information you want to display about the user here
-                          ],
+                child: Padding(
+                  padding: const EdgeInsets.all(25.0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
+                              const SizedBox(height: 16),
+                              Text(userProfile!.name, style: const TextStyle(fontSize: 24)),
+                              Text('@${userProfile!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
+                  
+                              // The user's bio
+                              Text(userProfile!.bio, style: const TextStyle(fontSize: 20)),
+                  
+                              const SizedBox(height: 16),
+                  
+                              // Show or hide the follow button based on whether it's the current user's profile
+                              if (!isCurrentUserProfile)
+                                // button to allow users to follow and unfollow the user in question
+                                ElevatedButton(
+                                  onPressed: () => toggleFollowUser(userProfile!.id),
+                                  child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
+                                ),
+                  
+                              // // button to allow users to follow and unfollow the user in question
+                              // ElevatedButton(
+                              //   onPressed: () => toggleFollowUser(userProfile!.id),
+                              //   child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
+                              // ),
+                              // ElevatedButton(
+                              //   onPressed: currentUser!.following.contains(userProfile!.id)
+                              //       ? null
+                              //       : () => followUser(userProfile!.id),
+                              //   child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
+                              // ),
+                              // Add any other information you want to display about the user here
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: posts.length,
-                        itemBuilder: (context, index) {
-                          PostModel post = posts[index];
-                          return PostTile(post: post, user: userProfile!, feedLoadTime: DateTime.now());
-                        },
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: posts.length,
+                          itemBuilder: (context, index) {
+                            PostModel post = posts[index];
+                            return PostTile(post: post, user: userProfile!, feedLoadTime: DateTime.now());
+                          },
+                        ),
                       ),
-                    ),
-                    if (isLoadingPosts)
-                      const Center(child: CircularProgressIndicator()),
-                  ],
+                      if (isLoadingPosts)
+                        const Center(child: CircularProgressIndicator()),
+                    ],
+                  ),
                 ),
               ),
             ),

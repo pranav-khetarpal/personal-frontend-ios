@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_post_tile.dart';
 import 'package:personal_frontend/models/post_model.dart';
@@ -12,11 +13,7 @@ class CurrentUserProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      onGenerateRoute: (routeSettings) {
-        return MaterialPageRoute(builder: (context) => const CurrentUserProfileHome());
-      },
-    );
+    return const CurrentUserProfileHome();
   }
 }
 
@@ -160,51 +157,54 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                   }
                   return false;
                 },
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
-                            const SizedBox(height: 16),
-
-                            Text(currentUser!.name, style: const TextStyle(fontSize: 24)),
-                            Text('@${currentUser!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
-
-                            const SizedBox(height: 16,),
-
-                            // Button to allow the user to edit their profile information
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) => const EditProfilePage()),
-                                    );
-                                  },
-                                  child: const Text("Edit Profile"),
-                                ),
-                              ],
-                            ),
-                          ],
+                child: Padding(
+                  padding: const EdgeInsets.all(25.0),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
+                              const SizedBox(height: 16),
+                  
+                              Text(currentUser!.name, style: const TextStyle(fontSize: 24)),
+                              Text('@${currentUser!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
+                  
+                              const SizedBox(height: 16,),
+                  
+                              // Button to allow the user to edit their profile information
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                                      );
+                                    },
+                                    child: const Text("Edit Profile"),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: posts.length,
-                        itemBuilder: (context, index) {
-                          PostModel post = posts[index];
-                          return PostTile(post: post, user: currentUser!, feedLoadTime: DateTime.now());
-                        },
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: posts.length,
+                          itemBuilder: (context, index) {
+                            PostModel post = posts[index];
+                            return PostTile(post: post, user: currentUser!, feedLoadTime: DateTime.now());
+                          },
+                        ),
                       ),
-                    ),
-                    if (isLoading)
-                      const Center(child: CircularProgressIndicator()),
-                  ],
+                      if (isLoading)
+                        const Center(child: CircularProgressIndicator()),
+                    ],
+                  ),
                 ),
               ),
             ),

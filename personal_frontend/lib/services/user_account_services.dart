@@ -13,6 +13,7 @@ class UserAccountServices {
     required String name,
     required String email,
     required String username,
+    required String bio,
   }) async {
     try {
       // Retrieve the Firebase token of the current logged-in user
@@ -25,6 +26,7 @@ class UserAccountServices {
         'name': name,
         'email': email,
         'username': username,
+        'bio': bio,
       };
 
       final response = await http.post(
@@ -73,6 +75,37 @@ class UserAccountServices {
     }
   }
 
+  // Method to update the profile information of a user
+  Future<bool> updateUserProfile(UserModel updatedUser) async {
+    try {
+      // Retrieve the Firebase token of the current logged-in user
+      String token = await authServices.getIdToken();
+
+      String url = IPAddressAndRoutes.getRoute('updateUser');
+
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include the token in the headers
+        },
+        body: jsonEncode(updatedUser.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        // Handle different status codes if necessary
+        print('Failed to update profile: ${response.statusCode} ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      // Handle any exceptions that occur during the HTTP request
+      print('Error updating profile: $e');
+      return false;
+    }
+  }
+
 
   // Method to delete all of a user's content, including their posts
   Future<void> deleteUser() async {
@@ -109,36 +142,4 @@ class UserAccountServices {
       // throw Exception('Failed to delete user: $e');
     }
   }
-
-  // Method to update the profile information of a user
-  Future<bool> updateUserProfile(UserModel updatedUser) async {
-    try {
-      // Retrieve the Firebase token of the current logged-in user
-      String token = await authServices.getIdToken();
-
-      String url = IPAddressAndRoutes.getRoute('updateUser');
-
-      final response = await http.put(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Include the token in the headers
-        },
-        body: jsonEncode(updatedUser.toJson()),
-      );
-
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        // Handle different status codes if necessary
-        print('Failed to update profile: ${response.statusCode} ${response.body}');
-        return false;
-      }
-    } catch (e) {
-      // Handle any exceptions that occur during the HTTP request
-      print('Error updating profile: $e');
-      return false;
-    }
-  }
-
 }

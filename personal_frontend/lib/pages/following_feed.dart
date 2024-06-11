@@ -13,11 +13,12 @@ class FollowingFeed extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Navigator(
-      onGenerateRoute: (routeSettings) {
-        return MaterialPageRoute(builder: (context) => const FollowingFeedHome());
-      },
-    );
+    return const FollowingFeedHome();
+    // return Navigator(
+    //   onGenerateRoute: (routeSettings) {
+    //     return MaterialPageRoute(builder: (context) => const FollowingFeedHome());
+    //   },
+    // );
   }
 }
 
@@ -129,10 +130,14 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
           IconButton(
             icon: const Icon(Icons.message),
             onPressed: () {
-              Navigator.push(
-                context,
+              Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => const UserMessage()),
               );
+
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => const UserMessage()),
+              // );
             },
           ),
         ],
@@ -149,23 +154,26 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
             }
             return false;
           },
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  itemCount: posts.length,
-                  itemBuilder: (context, index) {
-                    PostModel post = posts[index];
-                    UserModel? user = users[post.userId];
-                    return user != null
-                        ? PostTile(post: post, user: user, feedLoadTime: feedLoadTime)
-                        : const Center(child: CircularProgressIndicator());
-                  },
+          child: Padding(
+            padding: const EdgeInsets.all(25.0),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) {
+                      PostModel post = posts[index];
+                      UserModel? user = users[post.userId];
+                      return user != null
+                          ? PostTile(post: post, user: user, feedLoadTime: feedLoadTime)
+                          : const Center(child: CircularProgressIndicator());
+                    },
+                  ),
                 ),
-              ),
-              if (isLoading)
-                const Center(child: CircularProgressIndicator()),
-            ],
+                if (isLoading)
+                  const Center(child: CircularProgressIndicator()),
+              ],
+            ),
           ),
         ),
       ),
