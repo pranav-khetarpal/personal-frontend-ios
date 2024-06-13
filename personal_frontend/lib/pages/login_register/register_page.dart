@@ -216,7 +216,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/components/my_button.dart';
+import 'package:personal_frontend/components/my_large_button.dart';
 import 'package:personal_frontend/components/my_square_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
@@ -426,7 +426,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 35),
 
                 // register button
-                MyButton(
+                MyLargeButton(
                   text: "Register",
                   onTap: register,
                 ),

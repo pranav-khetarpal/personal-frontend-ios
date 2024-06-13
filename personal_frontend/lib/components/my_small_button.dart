@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class MyButton extends StatelessWidget {
+class MySmallButton extends StatelessWidget {
   final String text;
   final void Function()? onTap;
 
-  const MyButton({
+  const MySmallButton({
     super.key,
     required this.text,
     required this.onTap,
@@ -19,13 +19,13 @@ class MyButton extends StatelessWidget {
           color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(5),
         ),
-        padding: const EdgeInsets.all(25),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20), // Smaller padding
         child: Center(
           child: Text(
             text,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: 14, // Smaller font size
               color: Theme.of(context).colorScheme.surface,
             ),
           ),

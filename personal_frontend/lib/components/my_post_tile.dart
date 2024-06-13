@@ -55,12 +55,23 @@ class PostTile extends StatelessWidget {
                           ),
                         );
                       },
-                      child: const CircleAvatar(
+                      // Profile Image
+                      child: CircleAvatar(
                         radius: 20,
-                        child: Icon(Icons.person),
+                        backgroundImage: user.profile_image_url.isNotEmpty
+                            ? NetworkImage(user.profile_image_url)
+                            : null,
+                        onBackgroundImageError: (exception, stackTrace) {
+                          print('Error loading profile image: $exception');
+                        },
+                        child: user.profile_image_url.isEmpty
+                            ? const Icon(Icons.account_circle, size: 50)
+                            : null,
                       ),
                     ),
+
                     const SizedBox(width: 8),
+                    
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

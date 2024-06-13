@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/components/my_button.dart';
+import 'package:personal_frontend/components/my_large_button.dart';
 import 'package:personal_frontend/components/my_expandable_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/services/post_services.dart';
@@ -87,7 +87,7 @@ class _AddPostState extends State<AddPostHome> {
             const SizedBox(height: 16.0),
             isLoading
                 ? const CircularProgressIndicator()
-                : MyButton(
+                : MyLargeButton(
                     onTap: submitPost,
                     text: 'Post',
                   ),

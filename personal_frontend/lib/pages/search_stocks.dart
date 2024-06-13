@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_rounded_textfield.dart';
+import 'package:personal_frontend/components/my_stock_tile.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/stock_model.dart';
 import 'package:personal_frontend/pages/stock_detail_page.dart';
@@ -145,11 +146,9 @@ class _SearchStocksHomeState extends State<SearchStocksHome> {
                 itemCount: searchResults.length,
                 itemBuilder: (context, index) {
                   StockModel stock = searchResults[index];
-                  return ListTile(
-                    title: Text(stock.name),
-                    subtitle: Text(stock.symbol),
-                    trailing: Text('\$${stock.price.toStringAsFixed(2)}'),
-                    onTap: () => navigateToStockDetail(context, stock.symbol), // Navigate to the stock detail page on tap
+                  return StockTile(
+                    stock: stock,
+                    onTap: () => navigateToStockDetail(context, stock.symbol),
                   );
                 },
               ),

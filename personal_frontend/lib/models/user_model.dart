@@ -52,6 +52,7 @@ class UserModel {
   final String name;
   final String username;
   final String bio;
+  String profile_image_url;
 
   // List of IDs of users that this user is following
   final List<String> following;
@@ -62,6 +63,7 @@ class UserModel {
     required this.name,
     required this.username,
     required this.bio,
+    required this.profile_image_url,
     required this.following,
   });
 
@@ -72,6 +74,7 @@ class UserModel {
       name: json['name'],
       username: json['username'],
       bio: json['bio'],
+      profile_image_url: json['profile_image_url'],
       following: List<String>.from(json['following']),
     );
   }
@@ -83,6 +86,7 @@ class UserModel {
       'name': name,
       'username': username,
       'bio': bio,
+      'profile_image_url': profile_image_url,
       'following': following,
     };
   }

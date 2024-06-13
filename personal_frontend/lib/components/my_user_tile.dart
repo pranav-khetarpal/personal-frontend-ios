@@ -10,11 +10,23 @@ class UserTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      tileColor: Theme.of(context).colorScheme.tertiary,
       onTap: onTap,
-      leading: const CircleAvatar(
+
+      // Profile Image
+      leading: CircleAvatar(
         radius: 20,
-        child: Icon(Icons.person),
+        backgroundImage: user.profile_image_url.isNotEmpty
+            ? NetworkImage(user.profile_image_url)
+            : null,
+        onBackgroundImageError: (exception, stackTrace) {
+          print('Error loading profile image: $exception');
+        },
+        child: user.profile_image_url.isEmpty
+            ? const Icon(Icons.account_circle, size: 50)
+            : null,
       ),
+      
       title: Text(
         user.name,
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

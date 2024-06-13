@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_post_tile.dart';
+import 'package:personal_frontend/components/my_small_button.dart';
 import 'package:personal_frontend/models/post_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/account_management/edit_profile_page.dart';
@@ -133,7 +134,7 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => SettingsPage()),
+                MaterialPageRoute(builder: (context) => SettingsPage(user: currentUser,)),
               );
               // Navigator.push(
               //   context, 
@@ -166,11 +167,33 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                         child: Center(
                           child: Column(
                             children: [
-                              const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
+                              // Profile image
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundImage: currentUser!.profile_image_url.isNotEmpty
+                                    ? NetworkImage(currentUser!.profile_image_url)
+                                    : null,
+                                onBackgroundImageError: (exception, stackTrace) {
+                                  print('Error loading profile image: $exception');
+                                  setState(() {
+                                    // Fallback to default icon or image in case of an error
+                                    currentUser!.profile_image_url = '';
+                                  });
+                                },
+                                child: currentUser!.profile_image_url.isEmpty
+                                    ? const Icon(Icons.account_circle, size: 50)
+                                    : null,
+                              ),
+
+                              // const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
+                              
                               const SizedBox(height: 16),
                   
                               Text(currentUser!.name, style: const TextStyle(fontSize: 24)),
                               Text('@${currentUser!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
+
+                              // The user's bio
+                              Text(currentUser!.bio, style: const TextStyle(fontSize: 20)),
                   
                               const SizedBox(height: 16,),
                   
@@ -178,14 +201,22 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  ElevatedButton(
-                                    onPressed: () {
+                                  MySmallButton(
+                                    text: "Edit Profile", 
+                                    onTap: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) => const EditProfilePage()),
                                       );
                                     },
-                                    child: const Text("Edit Profile"),
                                   ),
+                                  // ElevatedButton(
+                                  //   onPressed: () {
+                                  //     Navigator.of(context).push(
+                                  //       MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                                  //     );
+                                  //   },
+                                  //   child: const Text("Edit Profile"),
+                                  // ),
                                 ],
                               ),
                             ],

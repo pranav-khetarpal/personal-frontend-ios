@@ -1,10 +1,11 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/components/my_button.dart';
+import 'package:personal_frontend/components/my_large_button.dart';
+import 'package:personal_frontend/components/my_small_button.dart';
 import 'package:personal_frontend/components/my_square_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/user_model.dart';
+import 'package:personal_frontend/services/image_services.dart';
 import 'package:personal_frontend/services/user_account_services.dart';
 import 'package:personal_frontend/services/user_interation_services.dart';
 
@@ -24,6 +25,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // object to user UserInteractionServices methods
   final UserInteractionServices userInteractionServices = UserInteractionServices();
   final UserAccountServices userAccountServices = UserAccountServices();
+  final ImageServices imageServices = ImageServices();
 
   // text controllers
   final TextEditingController nameController = TextEditingController();
@@ -85,6 +87,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         name: nameController.text, // the user's inputted name
         username: usernameController.text, // the user's inputted username
         bio: bioController.text, // the user's inputted bio
+        profile_image_url: currentUser!.profile_image_url,
         following: currentUser!.following,
       );
 
@@ -105,6 +108,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+  // Method to handle photo upload
+  void handlePhotoUpload() async {
+    try {
+      await imageServices.updateUserProfileImage(currentUser!.id);
+      // Fetch the updated user profile to refresh the displayed image
+      await fetchCurrentUser();
+    } catch (e) {
+      print('Error uploading profile image: $e');
+      displayMessageToUser("Failed to upload profile image", context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,6 +132,55 @@ class _EditProfilePageState extends State<EditProfilePage> {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundImage: currentUser!.profile_image_url.isNotEmpty
+                            ? NetworkImage(currentUser!.profile_image_url)
+                            : null,
+                        onBackgroundImageError: (exception, stackTrace) {
+                          print('Error loading profile image: $exception');
+                          setState(() {
+                            // Fallback to default icon or image in case of an error
+                            currentUser!.profile_image_url = '';
+                          });
+                        },
+                        child: currentUser!.profile_image_url.isEmpty
+                            ? const Icon(Icons.account_circle, size: 50)
+                            : null,
+                      ),
+                      // CircleAvatar(
+                      //   radius: 50,
+                      //   backgroundImage: currentUser!.profile_image_url.isNotEmpty
+                      //       ? NetworkImage(currentUser!.profile_image_url)
+                      //       : null,
+                      //   child: currentUser!.profile_image_url.isEmpty
+                      //       ? const Icon(Icons.account_circle, size: 50)
+                      //       : null,
+                      //   // onBackgroundImageError: (exception, stackTrace) {
+                      //   //     print('Failed to load profile image: $exception');
+                      //   //     setState(() {
+                      //   //       currentUser!.profile_image_url = ''; // Reset to default icon
+                      //   //     });
+                      //   //   },
+                      // ),
+                      const SizedBox(width: 16),
+
+                      MySmallButton(
+                        text: "Upload photo", 
+                        onTap: handlePhotoUpload,
+                      ),
+                      // ElevatedButton(
+                      //   onPressed: handlePhotoUpload, // Call the photo upload method
+                      //   child: const Text("Upload photo"),
+                      // ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16,),
             
                   // name textfield
                   MySquareTextField(
@@ -152,8 +216,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   const SizedBox(height: 35),
             
                   // update button
-                  MyButton(
-                    text: "Update",
+                  MyLargeButton(
+                    text: "Update Public Information",
                     onTap: updateProfile,
                   ),
                 ],

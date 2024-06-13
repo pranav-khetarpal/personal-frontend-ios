@@ -37,6 +37,8 @@ class IPAddressAndRoutes {
     'checkUsernameAvailability': '/user/usernameAvailability',
 
     'unfollowOtherUser': '/user/unfollow',
+
+    'updateProfileImage': '/user/updateProfileImage',
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key

@@ -85,7 +85,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             if (_selectedIndex == index) {
               final navigatorState = _navigatorKeys[index].currentState;
               navigatorState!.popUntil((route) {
-                print("Route isFirst: ${route.isFirst} for index $index");
+                // print("Route isFirst: ${route.isFirst} for index $index");
                 return route.isFirst;
               });
             } else {
@@ -93,42 +93,42 @@ class _MainScaffoldState extends State<MainScaffold> {
                 _selectedIndex = index;
               });
             }
-
-            // // if statement handles the case that the navigation icon from the sub page of the main page is selected
-            // if (_selectedIndex == index) {
-            //   _navigatorKeys[index].currentState!.popUntil((route) => route.isCurrent);
-            // } else {
-            //   // otherwise, the user is on a different tab than the icon selected in the bottom navigation bar
-            //   setState(() {
-            //     _selectedIndex = index;
-            //   });
-            // }
-
-            // setState(() {
-            //     _selectedIndex = index;
-            //   });
-
           },
           type: BottomNavigationBarType.fixed,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: Icon(
+                Icons.home,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.stacked_line_chart),
+              icon: Icon(
+                Icons.stacked_line_chart_sharp,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.search),
+              icon: Icon(
+                Icons.search_sharp,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.add),
+              icon: Icon(
+                Icons.add,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
               label: '',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person),
+              icon: Icon(
+                Icons.person,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
               label: '',
             ),
           ],

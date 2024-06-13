@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_post_tile.dart';
+import 'package:personal_frontend/components/my_small_button.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/post_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
@@ -217,8 +218,26 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                         child: Center(
                           child: Column(
                             children: [
-                              const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
+                              // Profile Image
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundImage: userProfile!.profile_image_url.isNotEmpty
+                                    ? NetworkImage(userProfile!.profile_image_url)
+                                    : null,
+                                onBackgroundImageError: (exception, stackTrace) {
+                                  print('Error loading profile image: $exception');
+                                  setState(() {
+                                    // Fallback to default icon or image in case of an error
+                                    userProfile!.profile_image_url = '';
+                                  });
+                                },
+                                child: userProfile!.profile_image_url.isEmpty
+                                    ? const Icon(Icons.account_circle, size: 50)
+                                    : null,
+                              ),
+
                               const SizedBox(height: 16),
+
                               Text(userProfile!.name, style: const TextStyle(fontSize: 24)),
                               Text('@${userProfile!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
                   
@@ -226,14 +245,22 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                               Text(userProfile!.bio, style: const TextStyle(fontSize: 20)),
                   
                               const SizedBox(height: 16),
-                  
+
                               // Show or hide the follow button based on whether it's the current user's profile
                               if (!isCurrentUserProfile)
                                 // button to allow users to follow and unfollow the user in question
-                                ElevatedButton(
-                                  onPressed: () => toggleFollowUser(userProfile!.id),
-                                  child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
+                                MySmallButton(
+                                  text: currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow',
+                                  onTap: () => toggleFollowUser(userProfile!.id),
                                 ),
+                  
+                              // // Show or hide the follow button based on whether it's the current user's profile
+                              // if (!isCurrentUserProfile)
+                              //   // button to allow users to follow and unfollow the user in question
+                              //   ElevatedButton(
+                              //     onPressed: () => toggleFollowUser(userProfile!.id),
+                              //     child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
+                              //   ),
                   
                               // // button to allow users to follow and unfollow the user in question
                               // ElevatedButton(
