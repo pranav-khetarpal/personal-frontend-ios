@@ -62,13 +62,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   // update the current user's information
   void updateProfile() async {
     try {
-      // // Check if the username is available
-      // bool isAvailable = await userAccountServices.isUsernameAvailable(usernameController.text);
-      // if (!isAvailable) {
-      //   displayMessageToUser("Username is not available", context);
-      //   return;
-      // }
-
       // Check if the username has been changed
       bool usernameChanged = currentUser!.username != usernameController.text;
 
@@ -152,31 +145,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             ? const Icon(Icons.account_circle, size: 50)
                             : null,
                       ),
-                      // CircleAvatar(
-                      //   radius: 50,
-                      //   backgroundImage: currentUser!.profile_image_url.isNotEmpty
-                      //       ? NetworkImage(currentUser!.profile_image_url)
-                      //       : null,
-                      //   child: currentUser!.profile_image_url.isEmpty
-                      //       ? const Icon(Icons.account_circle, size: 50)
-                      //       : null,
-                      //   // onBackgroundImageError: (exception, stackTrace) {
-                      //   //     print('Failed to load profile image: $exception');
-                      //   //     setState(() {
-                      //   //       currentUser!.profile_image_url = ''; // Reset to default icon
-                      //   //     });
-                      //   //   },
-                      // ),
+
                       const SizedBox(width: 16),
 
                       MySmallButton(
                         text: "Upload photo", 
                         onTap: handlePhotoUpload,
                       ),
-                      // ElevatedButton(
-                      //   onPressed: handlePhotoUpload, // Call the photo upload method
-                      //   child: const Text("Upload photo"),
-                      // ),
                     ],
                   ),
 

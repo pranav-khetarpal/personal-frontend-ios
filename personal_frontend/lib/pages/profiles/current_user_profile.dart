@@ -136,10 +136,6 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => SettingsPage(user: currentUser,)),
               );
-              // Navigator.push(
-              //   context, 
-              //   MaterialPageRoute(builder: (context) => SettingsPage()),
-              // );
             },
           ),
         ],
@@ -209,14 +205,6 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                                       );
                                     },
                                   ),
-                                  // ElevatedButton(
-                                  //   onPressed: () {
-                                  //     Navigator.of(context).push(
-                                  //       MaterialPageRoute(builder: (context) => const EditProfilePage()),
-                                  //     );
-                                  //   },
-                                  //   child: const Text("Edit Profile"),
-                                  // ),
                                 ],
                               ),
                             ],
@@ -228,7 +216,13 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                           itemCount: posts.length,
                           itemBuilder: (context, index) {
                             PostModel post = posts[index];
-                            return PostTile(post: post, user: currentUser!, feedLoadTime: DateTime.now());
+                            return PostTile(
+                              post: post, 
+                              postUser: currentUser!, 
+                              feedLoadTime: DateTime.now(),
+                              currentUser: currentUser!,
+                              postServices: postServices,
+                            );
                           },
                         ),
                       ),

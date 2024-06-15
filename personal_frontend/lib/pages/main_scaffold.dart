@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/pages/add_post.dart';
+import 'package:personal_frontend/pages/post_pages/add_post.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
 import 'package:personal_frontend/pages/following_feed.dart';
 import 'package:personal_frontend/pages/profiles/current_user_profile.dart';

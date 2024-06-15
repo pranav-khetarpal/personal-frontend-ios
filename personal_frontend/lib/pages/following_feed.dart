@@ -14,11 +14,6 @@ class FollowingFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const FollowingFeedHome();
-    // return Navigator(
-    //   onGenerateRoute: (routeSettings) {
-    //     return MaterialPageRoute(builder: (context) => const FollowingFeedHome());
-    //   },
-    // );
   }
 }
 
@@ -40,20 +35,33 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
 
   late DateTime feedLoadTime; // Variable to track the time that the feed was loaded
 
-  // Object to use PostServices methods
+  // Object to use PostServices / AuthServices / UserInteractionServices methods
   final PostServices postServices = PostServices();
-
-  // Object to use AuthServices methods
   final AuthServices authServices = AuthServices();
+  final UserInteractionServices userInteractionServices = UserInteractionServices();
 
-  // Object to use UserServices methods
-  final UserInteractionServices userServices = UserInteractionServices();
+  // varible to get the UserModel of the current logged in user
+  UserModel? currentUser;
 
   @override
   void initState() {
     super.initState();
     feedLoadTime = DateTime.now(); // Capture the current time
+    fetchCurrentUser(); // Fetch the UserModel of the current user
     fetchInitialPosts(); // Fetch initial posts when the screen is loaded
+  }
+
+  // Fetch the current user's profile
+  Future<void> fetchCurrentUser() async {
+    try {
+      UserModel user = await userInteractionServices.fetchCurrentUser();
+      setState(() {
+        currentUser = user;
+      });
+    } catch (error) {
+      // Handle error fetching current user
+      print('Error fetching current user: $error');
+    }
   }
 
   // Fetch the initial posts
@@ -79,7 +87,7 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
       // Fetch user information for each post
       for (var post in fetchedPosts) {
         if (!users.containsKey(post.userId)) {
-          UserModel user = await userServices.fetchUserProfile(post.userId);
+          UserModel user = await userInteractionServices.fetchUserProfile(post.userId);
           users[post.userId] = user;
         }
       }
@@ -165,7 +173,13 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
                       PostModel post = posts[index];
                       UserModel? user = users[post.userId];
                       return user != null
-                          ? PostTile(post: post, user: user, feedLoadTime: feedLoadTime)
+                          ? PostTile(
+                            post: post, 
+                            postUser: user, 
+                            feedLoadTime: feedLoadTime,
+                            currentUser: currentUser!,
+                            postServices: postServices,
+                          )
                           : const Center(child: CircularProgressIndicator());
                     },
                   ),

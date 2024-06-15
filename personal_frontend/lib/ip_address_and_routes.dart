@@ -11,34 +11,31 @@ class IPAddressAndRoutes {
   // map to make retrieving routes easier when needed
   static Map<String, String> routes = {
     'createUser': '/user/create',
-    
     'getOtherUser': '/user/',
     'getCurrentUser': '/user/current',
     'followOtherUser': '/user/follow',
+    'unfollowOtherUser': '/user/unfollow',
+    'logout': '/user/logout',
+    'updateUser': '/user/update',
+    'updateProfileImage': '/user/updateProfileImage',
+    'checkUsernameAvailability': '/user/usernameAvailability',
+    'deleteUser': '/user/delete',
     
     'searchUsername': '/search/users?username=',
 
     'createPost': '/posts/create',
     'fetchPosts': '/posts/fetch',
-
-    'logout': '/user/logout',
-
-    'deleteUser': '/user/delete',
-
-    'searchTicker': '/search/stocks?ticker=',
-    'stockInfo': '/stock/info/',
-
     'fetchUserPosts': '/posts/user',
 
+    'likePost': '/posts/like/',
+    'unlikePost': '/posts/unlike/',
+
+    'searchTicker': '/search/stocks?ticker=',
+
+    'stockInfo': '/stock/info/',
     'stockPrices': '/stock/prices?',
 
-    'updateUser': '/user/update',
-
-    'checkUsernameAvailability': '/user/usernameAvailability',
-
-    'unfollowOtherUser': '/user/unfollow',
-
-    'updateProfileImage': '/user/updateProfileImage',
+    'deletePost': '/posts/delete/',
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key

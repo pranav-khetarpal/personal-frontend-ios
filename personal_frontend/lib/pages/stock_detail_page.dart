@@ -6,7 +6,7 @@ import 'package:personal_frontend/services/stock_services.dart';
 class StockDetailPage extends StatefulWidget {
   final String symbol;
 
-  StockDetailPage({required this.symbol});
+  const StockDetailPage({super.key, required this.symbol});
 
   @override
   _StockDetailPageState createState() => _StockDetailPageState();

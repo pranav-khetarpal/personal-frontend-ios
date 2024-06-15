@@ -5,31 +5,31 @@ This class is the model for a user in the app
 */
 
 class PostModel {
-  // Unique identifier for the post
-  final String id;
-  
-  // ID of the user who created the post
-  final String userId;
-  
-  // Content of the post
-  final String content;
-  
-  // Timestamp of when the post was created
-  final DateTime timestamp;
+  final String id; // Unique identifier for the post
+  final String userId; // ID of the user who created the post
+  final String content; // Content of the post
+  final DateTime timestamp; // Timestamp of when the post was created
+  int likes_count; // number of likes on the post
+  final bool? isLikedByUser; // hold whether the current user likes the post in question
 
-  PostModel({required this.id, 
+  PostModel({
+    required this.id, 
     required this.userId, 
     required this.content, 
-    required this.timestamp
+    required this.timestamp,
+    required this.likes_count,
+    this.isLikedByUser,
   });
 
   // Factory constructor to create a Post instance from a JSON map
   factory PostModel.fromJson(Map<String, dynamic> json) {
     return PostModel(
-      id: json['id'], // Extract the 'id' field from the JSON map
-      userId: json['userId'], // Extract the 'userId' field from the JSON map
-      content: json['content'], // Extract the 'content' field from the JSON map
-      timestamp: DateTime.parse(json['timestamp']), // Convert the 'timestamp' string to a DateTime object
+      id: json['id'],
+      userId: json['userId'],
+      content: json['content'],
+      timestamp: DateTime.parse(json['timestamp']),
+      likes_count: json['likes_count'],
+      isLikedByUser: json['isLikedByUser'] ?? false, // Default to false if the field is not present
     );
   }
 
@@ -40,6 +40,8 @@ class PostModel {
       'userId': userId,
       'content': content,
       'timestamp': timestamp.toIso8601String(), // Convert DateTime to ISO 8601 string
+      'likes_count': likes_count,
+      'isLikedByUser': isLikedByUser ?? false, // Ensure a default value if the field is null
     };
   }
 }

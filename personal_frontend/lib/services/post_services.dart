@@ -40,6 +40,44 @@ class PostServices {
     }
   }
 
+
+
+
+
+  // Method to delete a post
+  Future<void> deletePost(String postId) async {
+    try {
+      // Retrieve the Firebase token of the current logged-in user
+      String token = await authServices.getIdToken();
+
+      String baseUrl = IPAddressAndRoutes.getRoute('deletePost');
+      String url = '$baseUrl$postId';
+
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print("Post deleted successfully");
+      } else {
+        // Handle unsuccessful post deletion
+        throw Exception('Failed to delete post: ${response.body}');
+      }
+    } catch (e) {
+      // Handle any errors that occur during the deletion process
+      print('Error occurred while deleting post: $e');
+    }
+  }
+
+
+
+
+
+
   // Fetches a list of posts, supporting pagination
   Future<List<PostModel>> fetchPosts({
     int limit = 10,
@@ -124,6 +162,60 @@ class PostServices {
       // Handle any errors that occur during the fetch operation
       print(e);
       rethrow;
+    }
+  }
+
+  // Method to allow the user to like a post
+  Future<void> likePost(String postId) async {
+    // Retrieve the Firebase token of the current logged-in user
+    String token = await authServices.getIdToken();
+
+    print("\n");
+    print(token);
+    print("\n");
+
+    // Construct the url
+    String baseUrl = IPAddressAndRoutes.getRoute('likePost');
+    String url = '$baseUrl$postId';
+
+    final response = await http.post(Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+    if (response.statusCode == 200) {
+      // Success
+      print('Post liked successfully');
+    } else {
+      // Error handling
+      throw Exception('Failed to like post: ${response.statusCode}');
+    }
+  }
+
+  // Method to allow the user to unlike a post
+  Future<void> unlikePost(String postId) async {
+    // Retrieve the Firebase token of the current logged-in user
+    String token = await authServices.getIdToken();
+
+    // Construct the url
+    String baseUrl = IPAddressAndRoutes.getRoute('unlikePost');
+    String url = '$baseUrl$postId';
+
+    final response = await http.post(Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+    if (response.statusCode == 200) {
+      // Success
+      print('Post liked successfully');
+    } else {
+      // Error handling
+      throw Exception('Failed to like post: ${response.statusCode}');
     }
   }
 

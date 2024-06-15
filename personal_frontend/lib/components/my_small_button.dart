@@ -16,7 +16,7 @@ class MySmallButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
+          color: Colors.grey.shade300,
           borderRadius: BorderRadius.circular(5),
         ),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20), // Smaller padding
@@ -26,7 +26,7 @@ class MySmallButton extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 14, // Smaller font size
-              color: Theme.of(context).colorScheme.surface,
+              color: Theme.of(context).colorScheme.secondary,
             ),
           ),
         ),

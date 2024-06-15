@@ -253,26 +253,6 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                                   text: currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow',
                                   onTap: () => toggleFollowUser(userProfile!.id),
                                 ),
-                  
-                              // // Show or hide the follow button based on whether it's the current user's profile
-                              // if (!isCurrentUserProfile)
-                              //   // button to allow users to follow and unfollow the user in question
-                              //   ElevatedButton(
-                              //     onPressed: () => toggleFollowUser(userProfile!.id),
-                              //     child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
-                              //   ),
-                  
-                              // // button to allow users to follow and unfollow the user in question
-                              // ElevatedButton(
-                              //   onPressed: () => toggleFollowUser(userProfile!.id),
-                              //   child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
-                              // ),
-                              // ElevatedButton(
-                              //   onPressed: currentUser!.following.contains(userProfile!.id)
-                              //       ? null
-                              //       : () => followUser(userProfile!.id),
-                              //   child: Text(currentUser!.following.contains(userProfile!.id) ? 'Following' : 'Follow'),
-                              // ),
                               // Add any other information you want to display about the user here
                             ],
                           ),
@@ -283,7 +263,13 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                           itemCount: posts.length,
                           itemBuilder: (context, index) {
                             PostModel post = posts[index];
-                            return PostTile(post: post, user: userProfile!, feedLoadTime: DateTime.now());
+                            return PostTile(
+                              post: post, 
+                              postUser: userProfile!, 
+                              feedLoadTime: DateTime.now(),
+                              currentUser: currentUser!,
+                              postServices: postServices,
+                            );
                           },
                         ),
                       ),

@@ -8,52 +8,6 @@ class UserAccountServices {
   // object to use AuthServices methods
   final AuthServices authServices = AuthServices();
 
-  // // Create a new user document
-  // Future<void> createUserDocument({
-  //   required String name,
-  //   required String email,
-  //   required String username,
-  //   required String bio,
-  // }) async {
-  //   try {
-  //     // Retrieve the Firebase token of the current logged-in user
-  //     String token = await authServices.getIdToken();
-
-  //     String url = IPAddressAndRoutes.getRoute('createUser');
-
-  //     // Create the user data to be sent in the request body
-  //     var userData = {
-  //       'name': name,
-  //       'email': email,
-  //       'username': username,
-  //       'bio': bio,
-  //     };
-
-  //     final response = await http.post(
-  //       Uri.parse(url),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Bearer $token',
-  //       },
-  //       body: jsonEncode(userData),
-  //     );
-
-  //     // Check if the request was successful
-  //     if (response.statusCode == 200) {
-  //       print('User document created successfully');
-  //     } else {
-  //       // Handle unsuccessful request
-  //       print('Failed to create user document: ${response.statusCode} ${response.reasonPhrase}');
-  //       print('Response body: ${response.body}');
-  //       throw Exception('Failed to create user document');
-  //     }
-  //   } catch (e) {
-  //     // Handle any errors that occur during the request
-  //     print('Error occurred while creating user document: $e');
-  //     rethrow;
-  //   }
-  // }
-
   // Create a new user document
   Future<void> createUserDocument({
     required String name,
