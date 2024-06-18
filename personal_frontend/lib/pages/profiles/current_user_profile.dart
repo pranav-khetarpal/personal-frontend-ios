@@ -40,7 +40,7 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
 
   // objects for PostServices and UserServices methods
   final PostServices postServices = PostServices();
-  final UserInteractionServices userServices = UserInteractionServices();
+  final UserInteractionServices userInteractionServices = UserInteractionServices();
 
   @override
   void initState() {
@@ -51,7 +51,7 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
   // Fetch the current user's profile and posts
   Future<void> fetchCurrentUser() async {
     try {
-      UserModel user = await userServices.fetchCurrentUser();
+      UserModel user = await userInteractionServices.fetchCurrentUser();
       setState(() {
         currentUser = user;
         isLoadingCurrentUser = false;

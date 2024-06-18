@@ -3,7 +3,7 @@ import 'package:personal_frontend/pages/post_pages/add_post.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
 import 'package:personal_frontend/pages/following_feed.dart';
 import 'package:personal_frontend/pages/profiles/current_user_profile.dart';
-import 'package:personal_frontend/pages/search_stocks.dart';
+import 'package:personal_frontend/stock_pages/search_stocks.dart';
 import 'package:personal_frontend/pages/search_users.dart';
 
 class MainScaffold extends StatefulWidget {

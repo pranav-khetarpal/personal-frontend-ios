@@ -29,6 +29,8 @@ class StockTile extends StatelessWidget {
         ),
       ),
 
+      onTap: onTap,
+
 
     );
   }

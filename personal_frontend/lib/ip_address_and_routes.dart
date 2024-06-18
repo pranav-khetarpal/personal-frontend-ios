@@ -20,22 +20,24 @@ class IPAddressAndRoutes {
     'updateProfileImage': '/user/updateProfileImage',
     'checkUsernameAvailability': '/user/usernameAvailability',
     'deleteUser': '/user/delete',
-    
+
     'searchUsername': '/search/users?username=',
 
     'createPost': '/posts/create',
     'fetchPosts': '/posts/fetch',
     'fetchUserPosts': '/posts/user',
-
     'likePost': '/posts/like/',
     'unlikePost': '/posts/unlike/',
+    'deletePost': '/posts/delete/',
 
     'searchTicker': '/search/stocks?ticker=',
 
     'stockInfo': '/stock/info/',
     'stockPrices': '/stock/prices?',
 
-    'deletePost': '/posts/delete/',
+    'deleteStockList': '/stock/stockLists/delete/',
+    'updateStockList': '/stock/stockLists/update/',
+    'createStockList': '/stock/stockLists/create',
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key

@@ -170,10 +170,6 @@ class PostServices {
     // Retrieve the Firebase token of the current logged-in user
     String token = await authServices.getIdToken();
 
-    print("\n");
-    print(token);
-    print("\n");
-
     // Construct the url
     String baseUrl = IPAddressAndRoutes.getRoute('likePost');
     String url = '$baseUrl$postId';

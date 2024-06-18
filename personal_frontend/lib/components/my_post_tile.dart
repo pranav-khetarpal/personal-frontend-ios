@@ -61,6 +61,7 @@ class _PostTileState extends State<PostTile> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // delete button
               MySmallButton(
                 text: 'Delete',
                 onTap: () {
@@ -233,7 +234,7 @@ class _PostTileState extends State<PostTile> {
                                 // Conditional rendering of IconButton for editing/deleting
                                 if (widget.post.userId == widget.currentUser.id)
                                   IconButton(
-                                    icon: Icon(Icons.more_vert),
+                                    icon: const Icon(Icons.more_vert),
                                     onPressed: () {
                                       showDeleteDialog(context);
                                     },

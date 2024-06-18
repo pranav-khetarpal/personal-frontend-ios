@@ -82,6 +82,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         bio: bioController.text, // the user's inputted bio
         profile_image_url: currentUser!.profile_image_url,
         following: currentUser!.following,
+        stockLists: currentUser!.stockLists,
       );
 
       // Send the updated data to the backend

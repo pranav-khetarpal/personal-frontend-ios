@@ -3,8 +3,12 @@ import 'package:personal_frontend/ip_address_and_routes.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:personal_frontend/models/stock_model.dart';
+import 'package:personal_frontend/services/authorization_services.dart';
 
 class StockServices {
+  // object to use AuthServices methods
+  final AuthServices authServices = AuthServices();
+
   // Method to search for stocks
   Future<List<StockModel>> searchStocks(String query) async {
     try {
@@ -76,7 +80,6 @@ class StockServices {
 
       if (response.statusCode == 200) {
         // Parse and return the response body
-        print(Map<String, double>.from(jsonDecode(response.body)));
         return Map<String, double>.from(jsonDecode(response.body));
       } else {
         // Handle error response
@@ -87,4 +90,113 @@ class StockServices {
       throw Exception('Failed to fetch stock prices: $e');
     }
   }
+
+
+
+  // Method to delete a stock list
+  Future<void> deleteStockList(String listName) async {
+    try {
+      String token = await authServices.getIdToken();
+
+      // build the url to delete the stock list
+      String baseUrl = IPAddressAndRoutes.getRoute('deleteStockList');
+      String url = '$baseUrl$listName';
+      
+      // send the HTTP DELETE request
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+        }
+      );
+      
+      if (response.statusCode != 204) {
+        throw Exception('Failed to delete stock list: ${response.reasonPhrase}');
+    }
+    } catch (e) {
+      print('Unexpected error: $e');
+      throw Exception('An unexpected error occurred. Please try again.');
+    }
+  }
+
+
+
+
+  // Method to update stock list in Firestore
+  Future<void> updateStockList(
+    String oldListName,
+    String newListName,
+    List<String> tickers,
+  ) async {
+    try {
+      String token = await authServices.getIdToken();
+
+      // Construct URL for API endpoint
+      String baseUrl = IPAddressAndRoutes.getRoute('updateStockList');
+      String url = '$baseUrl$oldListName';
+
+      // Create JSON payload for the request body
+      Map<String, dynamic> requestBody = {
+        'name': newListName,
+        'tickers': tickers,
+      };
+
+      // Send HTTP PUT request to update stock list
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update stock list: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Unexpected error: $e');
+      throw Exception('An unexpected error occurred. Please try again.');
+    }
+  }
+
+
+
+
+  // Method to create a new stock list in Firestore
+  Future<void> createStockList(String listName, List<String> tickers) async {
+    try {
+      String token = await authServices.getIdToken();
+
+      // Construct URL for API endpoint
+      String url = IPAddressAndRoutes.getRoute('createStockList');
+
+      // Create JSON payload for the request body
+      Map<String, dynamic> requestBody = {
+        'name': listName,
+        'tickers': tickers,
+      };
+
+      // Send HTTP POST request to create stock list
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to create stock list: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Unexpected error: $e');
+      throw Exception('An unexpected error occurred. Please try again.');
+    }
+  }
+
+
+
+
 }
