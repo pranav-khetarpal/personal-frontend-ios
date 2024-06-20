@@ -1,42 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_small_button.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
-import 'package:personal_frontend/models/post_model.dart';
+import 'package:personal_frontend/models/comment_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/post_pages/post_and_comments_page.dart';
 import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
 import 'package:personal_frontend/services/post_services.dart';
 
-class PostTile extends StatefulWidget {
-  final PostModel post;
-  final UserModel postUser;
+class CommentTile extends StatefulWidget {
+  final CommentModel comment;
+  final UserModel commentUser;
   final DateTime feedLoadTime;
   final UserModel currentUser;
 
-  // object to use PostServices methods
-  final PostServices postServices;
-
-  const PostTile({
+  const CommentTile({
     super.key,
-    required this.post,
-    required this.postUser,
+    required this.comment,
+    required this.commentUser,
     required this.feedLoadTime,
     required this.currentUser,
-    required this.postServices,
   });
 
   @override
-  State<PostTile> createState() => _PostTileState();
+  State<CommentTile> createState() => _CommentTileState();
 }
 
-class _PostTileState extends State<PostTile> {
+class _CommentTileState extends State<CommentTile> {
   // Variable to keep track of whether the current user liked the post or not
   late bool isLiked = false;
 
   @override
   void initState() {
     super.initState();
-    isLiked = widget.post.isLikedByUser ?? false;
+    isLiked = widget.comment.isLikedByUser ?? false;
   }
 
   // Helper method to format the elapsed time

@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/components/my_rounded_textfield.dart';
 import 'package:personal_frontend/components/my_stock_tile.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/stock_model.dart';
@@ -31,8 +31,18 @@ class _CreateStockListPageState extends State<CreateStockListPage> {
   TextEditingController searchController = TextEditingController();
   TextEditingController stockListNameController = TextEditingController();
 
+  // Timer for debouncing
+  Timer? _debounce;
+
   // Object for using stockServices methods
   StockServices stockServices = StockServices();
+
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
 
   // Method to search for stocks by ticker
   Future<void> searchStocksByTicker(String query) async {
@@ -46,6 +56,20 @@ class _CreateStockListPageState extends State<CreateStockListPage> {
       print('Error searching stocks: $e');
       displayMessageToUser('Error searching stocks: $e', context);
     }
+  }
+
+  // Method to handle the search input changes with debounce
+  void onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (query.isNotEmpty) {
+        searchStocksByTicker(query);
+      } else {
+        setState(() {
+          searchResults.clear();
+        });
+      }
+    });
   }
 
   // Method to add a stock to localStocks
@@ -129,24 +153,16 @@ class _CreateStockListPageState extends State<CreateStockListPage> {
               Row(
                 children: [
                   Expanded(
-                    child: MyRoundedTextField(
-                      hintText: 'Search stocks to add',
+                    child: TextField(
                       controller: searchController,
-                      maxLength: 15,
-                      allowSpaces: false,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Search for a stock...',
+                      ),
+                      onChanged: onSearchChanged, // Call the onSearchChanged method when the text changes
                     ),
                   ),
                   const SizedBox(width: 8),
-
-                  // Search button
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      if (searchController.text.isNotEmpty) {
-                        searchStocksByTicker(searchController.text);
-                      }
-                    },
-                  ),
                 ],
               ),
 

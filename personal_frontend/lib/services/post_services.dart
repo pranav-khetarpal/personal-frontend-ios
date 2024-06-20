@@ -87,6 +87,10 @@ class PostServices {
       // Retrieve the Firebase token of the current logged-in user
       String token = await authServices.getIdToken();
 
+      print("\n");
+      print(token);
+      print("\n");
+
       String url = IPAddressAndRoutes.getRoute('fetchPosts');
       
       // Construct the URL with query parameters for pagination
@@ -97,10 +101,6 @@ class PostServices {
         // Specifies the ID of the last post fetched to enable fetching the next set of posts
         if (startAfterId != null) 'start_after': startAfterId,
       });
-
-      // print("'n");
-      // print("Token being sent:");
-      // print(token);
 
       final response = await http.get(
         uri,

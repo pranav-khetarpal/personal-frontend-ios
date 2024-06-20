@@ -1,12 +1,125 @@
+// import 'package:flutter/material.dart';
+// import 'package:personal_frontend/components/my_user_tile.dart';
+// import 'package:personal_frontend/helper/helper_functions.dart';
+// import 'package:personal_frontend/models/user_model.dart';
+// import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
+// import 'package:personal_frontend/services/user_interation_services.dart';
+// import 'package:personal_frontend/components/my_rounded_textfield.dart';
+
+// // class needed to ensure bottom navigation bar is present in sub pages
+// class SearchUsers extends StatelessWidget {
+//   const SearchUsers({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return const SearchUsersHome();
+//   }
+// }
+
+// class SearchUsersHome extends StatefulWidget {
+//   const SearchUsersHome({super.key});
+
+//   @override
+//   State<SearchUsersHome> createState() => _SearchUsersHomeState();
+// }
+
+// class _SearchUsersHomeState extends State<SearchUsersHome> {
+//   // List to hold the search results
+//   List<UserModel> searchResults = [];
+
+//   // Controller for the search text field
+//   final TextEditingController searchController = TextEditingController();
+
+//   // Object to use UserService methods
+//   final UserInteractionServices userService = UserInteractionServices();
+
+//   // Method to search for users by username
+//   Future<void> searchUsers(String query) async {
+//     try {
+//       int searchLimit = 10;
+//       final results = await userService.searchUsers(query, searchLimit);
+//       setState(() {
+//         searchResults = results;
+//       });
+//     } catch (e) {
+//       // Log the error and provide user feedback
+//       print('Error searching users: $e');
+//       displayMessageToUser('Error searching users: $e', context);
+//     }
+//   }
+
+//   // Method to navigate to the user profile page
+//   void navigateToUserProfile(BuildContext context, String userID) {
+//     Navigator.of(context).push(
+//       MaterialPageRoute(
+//         builder: (context) => OtherUserProfile(userID: userID), // Pass the userId to the profile page
+//       ),
+//     );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Search Users'), // Title of the search page
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(25.0),
+//         child: Column(
+//           children: [
+//             // Row to hold the search text field and search button
+//             Row(
+//               children: [
+//                 // Use the MyTextField component
+//                 Expanded(
+//                   child: MyRoundedTextField(
+//                     hintText: 'Search by username',
+//                     controller: searchController,
+//                     maxLength: 15,
+//                     allowSpaces: false,
+//                   ),
+//                 ),
+//                 const SizedBox(width: 8), // Add some space between the text field and button
+//                 // Search button
+//                 IconButton(
+//                   icon: const Icon(Icons.search),
+//                   onPressed: () {
+//                     searchUsers(searchController.text); // Call the search method when the button is pressed
+//                   },
+//                 ),
+//               ],
+//             ),
+//             const SizedBox(height: 16), // Add some space between the input row and the search results
+//             // Display search results
+//             Expanded(
+//               child: ListView.builder(
+//                 itemCount: searchResults.length,
+//                 itemBuilder: (context, index) {
+//                   UserModel user = searchResults[index];
+//                   return UserTile(
+//                     user: user,
+//                     onTap: () => navigateToUserProfile(context, user.id), // Navigate to the user profile page on tap
+//                   );
+//                 },
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+import 'dart:async'; // Import the async library
+
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_user_tile.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
 import 'package:personal_frontend/services/user_interation_services.dart';
-import 'package:personal_frontend/components/my_rounded_textfield.dart';
 
-// class needed to ensure bottom navigation bar is present in sub pages
+// Class needed to ensure bottom navigation bar is present in sub pages
 class SearchUsers extends StatelessWidget {
   const SearchUsers({super.key});
 
@@ -30,8 +143,17 @@ class _SearchUsersHomeState extends State<SearchUsersHome> {
   // Controller for the search text field
   final TextEditingController searchController = TextEditingController();
 
+  // Timer for debouncing
+  Timer? _debounce;
+
   // Object to use UserService methods
   final UserInteractionServices userService = UserInteractionServices();
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
 
   // Method to search for users by username
   Future<void> searchUsers(String query) async {
@@ -46,6 +168,20 @@ class _SearchUsersHomeState extends State<SearchUsersHome> {
       print('Error searching users: $e');
       displayMessageToUser('Error searching users: $e', context);
     }
+  }
+
+  // Method to handle the search input changes with debounce
+  void onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (query.isNotEmpty) {
+        searchUsers(query);
+      } else {
+        setState(() {
+          searchResults.clear();
+        });
+      }
+    });
   }
 
   // Method to navigate to the user profile page
@@ -72,20 +208,14 @@ class _SearchUsersHomeState extends State<SearchUsersHome> {
               children: [
                 // Use the MyTextField component
                 Expanded(
-                  child: MyRoundedTextField(
-                    hintText: 'Search by username',
+                  child: TextField(
                     controller: searchController,
-                    maxLength: 15,
-                    allowSpaces: false,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Search for a username...',
+                    ),
+                    onChanged: onSearchChanged, // Call the onSearchChanged method when the text changes
                   ),
-                ),
-                const SizedBox(width: 8), // Add some space between the text field and button
-                // Search button
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    searchUsers(searchController.text); // Call the search method when the button is pressed
-                  },
                 ),
               ],
             ),

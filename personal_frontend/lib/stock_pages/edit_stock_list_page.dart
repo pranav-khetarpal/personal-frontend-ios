@@ -111,73 +111,76 @@
 //               // Handle done button pressed (to be implemented)
 //               // This is where you'll send updates to backend
 //               updateStockList();
-//               // For now, just pop the page
-//               Navigator.of(context).pop();
 //             },
 //             icon: const Icon(Icons.done),
 //           ),
 //         ],
 //       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.stretch,
-//           children: [
-//             TextField(
-//               controller: stockListNameController,
-//               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-//               decoration: const InputDecoration(
-//                 hintText: 'List Name',
-//               ),
-//             ),
-
-//             const SizedBox(height: 16),
-
-//             // Row to hold the search text field and search button
-//             Row(
-//               children: [
-//                 Expanded(
-//                   child: MyRoundedTextField(
-//                     hintText: 'Search stocks to add',
-//                     controller: searchController,
-//                     maxLength: 15,
-//                     allowSpaces: false,
-//                   ),
+//       body: SingleChildScrollView(
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: [
+//               TextField(
+//                 controller: stockListNameController,
+//                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+//                 decoration: const InputDecoration(
+//                   hintText: 'List Name',
 //                 ),
-//                 const SizedBox(width: 8),
+//               ),
 
-//                 // Search button
-//                 IconButton(
-//                   icon: const Icon(Icons.search),
-//                   onPressed: () {
-//                     if (searchController.text.isNotEmpty) {
-//                       searchStocksByTicker(searchController.text);
-//                     }
+//               const SizedBox(height: 16),
+
+//               // Row to hold the search text field and search button
+//               Row(
+//                 children: [
+//                   Expanded(
+//                     child: MyRoundedTextField(
+//                       hintText: 'Search stocks to add',
+//                       controller: searchController,
+//                       maxLength: 15,
+//                       allowSpaces: false,
+//                     ),
+//                   ),
+//                   const SizedBox(width: 8),
+
+//                   // Search button
+//                   IconButton(
+//                     icon: const Icon(Icons.search),
+//                     onPressed: () {
+//                       if (searchController.text.isNotEmpty) {
+//                         searchStocksByTicker(searchController.text);
+//                       }
+//                     },
+//                   ),
+//                 ],
+//               ),
+
+//               const SizedBox(height: 16),
+
+//               // Display search results
+//               if (searchResults.isNotEmpty)
+//                 ListView.builder(
+//                   shrinkWrap: true,
+//                   physics: const NeverScrollableScrollPhysics(),
+//                   itemCount: searchResults.length,
+//                   itemBuilder: (context, index) {
+//                     StockModel stock = searchResults[index];
+//                     return StockTile(
+//                       stock: stock,
+//                       onTap: () => addToLocalStocks(stock), // Add stock to localStocks on tap
+//                     );
 //                   },
 //                 ),
-//               ],
-//             ),
 
-//             // Display search results
-//             if (searchResults.isNotEmpty) Expanded(
-//               child: ListView.builder(
-//                 itemCount: searchResults.length,
-//                 itemBuilder: (context, index) {
-//                   StockModel stock = searchResults[index];
-//                   return StockTile(
-//                     stock: stock,
-//                     onTap: () => addToLocalStocks(stock), // Add stock to localStocks on tap
-//                   );
-//                 },
-//               ),
-//             ),
+//               const SizedBox(height: 16),
 
-//             const SizedBox(height: 16),
-
-//             // ReorderableListView to display and reorder localStocks
-//             Expanded(
-//               child: ReorderableListView(
+//               // ReorderableListView to display and reorder localStocks
+//               ReorderableListView(
 //                 padding: const EdgeInsets.symmetric(vertical: 8),
+//                 shrinkWrap: true,
+//                 physics: const NeverScrollableScrollPhysics(),
 //                 children: localStocks.map((stockSymbol) {
 //                   return ListTile(
 //                     key: Key(stockSymbol),
@@ -202,16 +205,18 @@
 //                   });
 //                 },
 //               ),
-//             ),
-//           ],
+//             ],
+//           ),
 //         ),
 //       ),
 //     );
 //   }
 // }
 
+
+import 'dart:async'; // Import the async library
+
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/components/my_rounded_textfield.dart';
 import 'package:personal_frontend/components/my_stock_tile.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/stock_model.dart';
@@ -245,6 +250,9 @@ class _EditStockListPageState extends State<EditStockListPage> {
   TextEditingController searchController = TextEditingController();
   TextEditingController stockListNameController = TextEditingController();
 
+  // Timer for debouncing
+  Timer? _debounce;
+
   // Object for using stockServices methods
   StockServices stockServices = StockServices();
 
@@ -256,6 +264,12 @@ class _EditStockListPageState extends State<EditStockListPage> {
 
     // make sure the text controller for the stock list name is full
     stockListNameController.text = widget.listName;
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   // Method to search for stocks by ticker
@@ -270,6 +284,20 @@ class _EditStockListPageState extends State<EditStockListPage> {
       print('Error searching stocks: $e');
       displayMessageToUser('Error searching stocks: $e', context);
     }
+  }
+
+  // Method to handle the search input changes with debounce
+  void onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (query.isNotEmpty) {
+        searchStocksByTicker(query);
+      } else {
+        setState(() {
+          searchResults.clear();
+        });
+      }
+    });
   }
 
   // Method to add a stock to localStocks
@@ -348,23 +376,14 @@ class _EditStockListPageState extends State<EditStockListPage> {
               Row(
                 children: [
                   Expanded(
-                    child: MyRoundedTextField(
-                      hintText: 'Search stocks to add',
+                    child: TextField(
                       controller: searchController,
-                      maxLength: 15,
-                      allowSpaces: false,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Search for a stock...',
+                      ),
+                      onChanged: onSearchChanged, // Call the onSearchChanged method when the text changes
                     ),
-                  ),
-                  const SizedBox(width: 8),
-
-                  // Search button
-                  IconButton(
-                    icon: const Icon(Icons.search),
-                    onPressed: () {
-                      if (searchController.text.isNotEmpty) {
-                        searchStocksByTicker(searchController.text);
-                      }
-                    },
                   ),
                 ],
               ),
@@ -424,4 +443,3 @@ class _EditStockListPageState extends State<EditStockListPage> {
     );
   }
 }
-

@@ -34,10 +34,12 @@ class IPAddressAndRoutes {
 
     'stockInfo': '/stock/info/',
     'stockPrices': '/stock/prices?',
-
     'deleteStockList': '/stock/stockLists/delete/',
     'updateStockList': '/stock/stockLists/update/',
     'createStockList': '/stock/stockLists/create',
+
+    'createComment': '/comments/create',
+    'deleteComment': '/comments/delete/'
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key
