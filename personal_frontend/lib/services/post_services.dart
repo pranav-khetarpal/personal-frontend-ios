@@ -40,10 +40,6 @@ class PostServices {
     }
   }
 
-
-
-
-
   // Method to delete a post
   Future<void> deletePost(String postId) async {
     try {
@@ -73,11 +69,6 @@ class PostServices {
     }
   }
 
-
-
-
-
-
   // Fetches a list of posts, supporting pagination
   Future<List<PostModel>> fetchPosts({
     int limit = 10,
@@ -86,11 +77,7 @@ class PostServices {
     try {
       // Retrieve the Firebase token of the current logged-in user
       String token = await authServices.getIdToken();
-
-      print("\n");
-      print(token);
-      print("\n");
-
+      
       String url = IPAddressAndRoutes.getRoute('fetchPosts');
       
       // Construct the URL with query parameters for pagination
@@ -214,5 +201,4 @@ class PostServices {
       throw Exception('Failed to like post: ${response.statusCode}');
     }
   }
-
 }

@@ -269,6 +269,7 @@ class _OtherUserProfileState extends State<OtherUserProfile> {
                               feedLoadTime: DateTime.now(),
                               currentUser: currentUser!,
                               postServices: postServices,
+                              allowCommentPageNavigation: true,
                             );
                           },
                         ),

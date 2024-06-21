@@ -12,6 +12,7 @@ class PostTile extends StatefulWidget {
   final UserModel postUser;
   final DateTime feedLoadTime;
   final UserModel currentUser;
+  final bool allowCommentPageNavigation;
 
   // object to use PostServices methods
   final PostServices postServices;
@@ -23,6 +24,7 @@ class PostTile extends StatefulWidget {
     required this.feedLoadTime,
     required this.currentUser,
     required this.postServices,
+    required this.allowCommentPageNavigation,
   });
 
   @override
@@ -269,54 +271,32 @@ class _PostTileState extends State<PostTile> {
                                   Text('${widget.post.likes_count} likes'),
                                 ],
                               ),
-                              // // display the like Icon if it is not the current user's post
-                              // if (widget.post.userId != widget.currentUser.id)
-                              //   IconButton(
-                              //     icon: isLiked ? const Icon(Icons.favorite) : const Icon(Icons.favorite_border),
-                              //     onPressed: handleLikePost,
-                              //   ),
-
-                              // // number of likes
-                              // Text('${widget.post.likes_count} likes'),
 
                               Row(
                                 children: [
-                                  // display the comments button
-                                  IconButton(
-                                    onPressed: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) => PostAndCommentsPage(
-                                            post: widget.post,
-                                            postUser: widget.postUser,
-                                            currentUser: widget.currentUser,
+                                  
+                                  if (widget.allowCommentPageNavigation)
+                                    // display the comments button
+                                    IconButton(
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => PostAndCommentsPage(
+                                              post: widget.post,
+                                              postUser: widget.postUser,
+                                              currentUser: widget.currentUser,
+                                              postServices: widget.postServices,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    icon: const Icon(Icons.comment)
-                                  ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.comment)
+                                    ),
 
                                   // number of comments
                                   Text('${widget.post.comments_count} comments'),
                                 ],
                               ),
-
-
-                              // // display the comments button
-                              // IconButton(
-                              //   onPressed: () {
-                              //     Navigator.of(context).push(
-                              //       MaterialPageRoute(
-                              //         builder: (context) => PostAndCommentsPage(),
-                              //       ),
-                              //     );
-                              //   },
-                              //   icon: const Icon(Icons.comment)
-                              // ),
-
-                              // // number of comments
-                              // Text('${widget.post.comments_count} comments'),
                             ],
                           ),
                         ],
@@ -327,9 +307,10 @@ class _PostTileState extends State<PostTile> {
               ],
             ),
           ),
-          Divider(
-            color: Theme.of(context).colorScheme.inversePrimary,
-            thickness: 1,
+          if (widget.allowCommentPageNavigation)
+            Divider(
+              color: Colors.grey.shade200,
+              thickness: 1,
           ),
         ],
       ),

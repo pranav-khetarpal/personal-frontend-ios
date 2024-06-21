@@ -39,7 +39,11 @@ class IPAddressAndRoutes {
     'createStockList': '/stock/stockLists/create',
 
     'createComment': '/comments/create',
-    'deleteComment': '/comments/delete/'
+    'deleteComment': '/comments/delete/',
+    'fetchComments': '/comments/fetch',
+    'likeComment': '/comments/like/',
+    'unlikeComment': '/comments/unlike/',
+
   };
 
   // Returns the route for given needed for a specific operation, defined by the given key

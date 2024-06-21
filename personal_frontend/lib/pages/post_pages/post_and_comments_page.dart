@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:personal_frontend/components/my_comment_tile.dart';
+import 'package:personal_frontend/components/my_post_tile.dart';
+import 'package:personal_frontend/components/my_square_textfield.dart';
+import 'package:personal_frontend/models/comment_model.dart';
 import 'package:personal_frontend/models/post_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/services/comments_services.dart';
+import 'package:personal_frontend/services/post_services.dart';
+import 'package:personal_frontend/services/user_interation_services.dart';
 
 class PostAndCommentsPage extends StatefulWidget {
   final PostModel post;
   final UserModel postUser;
   final UserModel currentUser;
+  final PostServices postServices;
 
   const PostAndCommentsPage({
     super.key,
     required this.post,
     required this.postUser,
     required this.currentUser,
+    required this.postServices,
   });
 
   @override
@@ -20,48 +28,136 @@ class PostAndCommentsPage extends StatefulWidget {
 }
 
 class _PostAndCommentsPageState extends State<PostAndCommentsPage> {
+  final List<CommentModel> comments = [];
+  final Map<String, UserModel> commentUsers = {};
+  bool isLoading = false;
+  bool hasMore = true;
+  String? lastCommentId;
+  final int limit = 10;
+
+  // object to use CommentServices methods
   final CommentServices commentServices = CommentServices();
-  final TextEditingController _commentController = TextEditingController();
 
-  // Dummy comments data
-  List<String> comments = [
-    'This is the first comment!',
-    'Here is another comment.',
-    'Nice post!',
-    'I totally agree with this!',
-    'This is insightful.',
-  ];
+  // text controller
+  final TextEditingController commentController = TextEditingController();
 
-  // Method to add a comment
-  Future<void> _addComment() async {
-    if (_commentController.text.isEmpty) return;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchInitialComments();
+  }
+
+  // Method to fetch the initial comments when the page is loaded
+  Future<void> fetchInitialComments() async {
+    setState(() {
+      isLoading = true;
+    });
+    await fetchComments();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  // Method fetch comments up to a certain limit at a time
+  Future<void> fetchComments() async {
+    try {
+      List<CommentModel> fetchedComments = await commentServices.fetchComments(
+        postId: widget.post.id,
+        limit: limit,
+        startAfterId: lastCommentId,
+      );
+
+      for (var comment in fetchedComments) {
+        if (!commentUsers.containsKey(comment.userId)) {
+          UserModel user = await UserInteractionServices().fetchUserProfile(comment.userId);
+          commentUsers[comment.userId] = user;
+        }
+      }
+
+      setState(() {
+        comments.addAll(fetchedComments);
+        hasMore = fetchedComments.length == limit;
+        if (fetchedComments.isNotEmpty) {
+          lastCommentId = fetchedComments.last.id;
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // Refresh the comment feed when the user chooses to do so
+  Future<void> refreshComments() async {
+    setState(() {
+      comments.clear();
+      commentUsers.clear();
+      lastCommentId = null;
+      hasMore = true;
+    });
+    await fetchInitialComments();
+  }
+
+  // Load more comments when the user scrolls to the bottom of their available feed
+  Future<void> loadMoreComments() async {
+    if (hasMore && !isLoading) {
+      setState(() {
+        isLoading = true;
+      });
+      await fetchComments();
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+
+  // // Method to add a comment
+  // Future<void> addComment() async {
+  //   if (commentController.text.isEmpty) return;
+
+  //   try {
+  //     await commentServices.submitComment(
+  //       postId: widget.post.id,
+  //       content: commentController.text,
+  //     );
+  //     setState(() {
+  //       comments.add(commentController.text);
+  //       commentController.clear();
+  //     });
+  //   } catch (e) {
+  //     print('Error occurred while adding comment: $e');
+  //   }
+  // }
+
+    // Method to add a comment
+  Future<void> addComment() async {
+    if (commentController.text.isEmpty) return;
 
     try {
       await commentServices.submitComment(
         postId: widget.post.id,
-        content: _commentController.text,
+        content: commentController.text,
       );
+
+      // // Assuming the backend returns the created comment with its ID and user info
+      // // You might need to adapt this part based on your actual backend response
+      // CommentModel newComment = CommentModel(
+      //   id: 'newly_created_comment_id', // Replace with actual ID
+      //   userId: widget.currentUser.id,
+      //   content: commentController.text,
+      //   timestamp: DateTime.now(),
+
+      // );
+
       setState(() {
-        comments.add(_commentController.text);
-        _commentController.clear();
+        // comments.add(newComment);
+        // commentUsers[widget.currentUser.id] = widget.currentUser;
+        refreshComments();
+        commentController.clear();
       });
     } catch (e) {
       print('Error occurred while adding comment: $e');
-    }
-  }
-
-  // Method to delete a comment
-  Future<void> _deleteComment(int index, String commentId) async {
-    try {
-      await commentServices.deleteComment(
-        postId: widget.post.id,
-        commentId: commentId,
-      );
-      setState(() {
-        comments.removeAt(index);
-      });
-    } catch (e) {
-      print('Error occurred while deleting comment: $e');
     }
   }
 
@@ -69,97 +165,98 @@ class _PostAndCommentsPageState extends State<PostAndCommentsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Post and Comments'),
+        title: const Text("Post and Comments"),
       ),
-      body: Column(
-        children: [
-          // Display the post at the top
-          Padding(
+      body: RefreshIndicator(
+        onRefresh: refreshComments,
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollEndNotification &&
+                scrollNotification.metrics.extentAfter == 0) {
+              loadMoreComments();
+              return true;
+            }
+            return false;
+          },
+          child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundImage: widget.postUser.profile_image_url.isNotEmpty
-                          ? NetworkImage(widget.postUser.profile_image_url)
-                          : null,
-                      onBackgroundImageError: (exception, stackTrace) {
-                        print('Error loading profile image: $exception');
-                      },
-                      child: widget.postUser.profile_image_url.isEmpty
-                          ? const Icon(Icons.account_circle, size: 50)
-                          : null,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.postUser.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            widget.post.content,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 202, 231, 255),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: PostTile(
+                    post: widget.post,
+                    postUser: widget.postUser,
+                    feedLoadTime: DateTime.now(),
+                    currentUser: widget.currentUser,
+                    postServices: widget.postServices,
+                    allowCommentPageNavigation: false,
+                  ),
                 ),
-              ],
-            ),
-          ),
-          const Divider(thickness: 1),
 
-          // Display comments in a scrollable ListView
-          Expanded(
-            child: ListView.builder(
-              itemCount: comments.length,
-              itemBuilder: (context, index) {
-                String commentId = 'dummy_comment_id_$index'; // This should be the actual comment ID from the backend
-                return ListTile(
-                  title: Text(comments[index]),
-                  trailing: widget.currentUser.id == widget.postUser.id
-                      ? IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () => _deleteComment(index, commentId),
-                        )
-                      : null,
-                );
-              },
-            ),
-          ),
+                const SizedBox(height: 16.0),
 
-          // TextField and Post Button at the bottom
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
                 Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: const InputDecoration(
-                      hintText: 'Write a comment...',
+                  child: ListView.builder(
+                    itemCount: comments.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == comments.length) {
+                        return hasMore
+                            ? const Center(child: CircularProgressIndicator())
+                            : const SizedBox.shrink();
+                      }
+                      CommentModel comment = comments[index];
+                      UserModel? commentUser = commentUsers[comment.userId];
+                      return commentUser != null
+                          ? CommentTile(
+                              comment: comment,
+                              commentUser: commentUser,
+                              feedLoadTime: DateTime.now(),
+                              currentUser: widget.currentUser,
+                              commentServices: commentServices,
+                              postId: widget.post.id,
+                            )
+                          : const Center(child: CircularProgressIndicator());
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 8.0),
+
+                Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 202, 231, 255),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: MySquareTextField(
+                            hintText: "Write a comment...", 
+                            obscureText: false, 
+                            controller: commentController, 
+                            maxLength: 280, 
+                            allowSpaces: true,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.send),
+                          onPressed: addComment,
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _addComment,
-                ),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

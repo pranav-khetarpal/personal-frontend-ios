@@ -1,50 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_small_button.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
-import 'package:personal_frontend/models/comment_model.dart';
+import 'package:personal_frontend/models/post_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
-import 'package:personal_frontend/services/comments_services.dart';
+import 'package:personal_frontend/services/post_services.dart';
 
-class CommentTile extends StatefulWidget {
-  final CommentModel comment;
-  final UserModel commentUser;
+class PostTile extends StatefulWidget {
+  final PostModel post;
+  final UserModel postUser;
   final DateTime feedLoadTime;
   final UserModel currentUser;
 
-  // The id of the post is required for many operations that may be performed on comments
-  final String postId;
+  // object to use PostServices methods
+  final PostServices postServices;
 
-  // object to use CommentServices methods
-  final CommentServices commentServices;
-
-  const CommentTile({
+  const PostTile({
     super.key,
-    required this.comment,
-    required this.commentUser,
+    required this.post,
+    required this.postUser,
     required this.feedLoadTime,
     required this.currentUser,
-    required this.commentServices,
-    required this.postId,
+    required this.postServices,
   });
 
   @override
-  State<CommentTile> createState() => _CommentTileState();
+  State<PostTile> createState() => _PostTileState();
 }
 
-class _CommentTileState extends State<CommentTile> {
-  // Variable to keep track of whether the current user liked the comment or not
+class _PostTileState extends State<PostTile> {
+  // Variable to keep track of whether the current user liked the post or not
   late bool isLiked = false;
 
   @override
   void initState() {
     super.initState();
-    isLiked = widget.comment.isLikedByUser ?? false;
+    isLiked = widget.post.isLikedByUser ?? false;
   }
 
   // Helper method to format the elapsed time
-  String getElapsedTime(DateTime commentTime) {
-    final duration = widget.feedLoadTime.difference(commentTime);
+  String getElapsedTime(DateTime postTime) {
+    final duration = widget.feedLoadTime.difference(postTime);
     if (duration.inDays > 0) {
       return '${duration.inDays}d ago';
     } else if (duration.inHours > 0) {
@@ -56,7 +52,7 @@ class _CommentTileState extends State<CommentTile> {
     }
   }
 
-  // Method to show the delete comment dialog
+  // Method to show the delete post dialog
   void showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -80,14 +76,14 @@ class _CommentTileState extends State<CommentTile> {
     );
   }
 
-  // pop up to confirm whether the user would like to delete their comment
+  // pop up to confirm whether the user would like to delete their post
   void showConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this comment?'),
+          content: const Text('Are you sure you want to delete this post?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -98,7 +94,7 @@ class _CommentTileState extends State<CommentTile> {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop(); // Close the confirmation dialog
-                await handleDeleteComment(context); // Handle the comment deletion
+                await handleDeletePost(context); // Handle the post deletion
               },
               child: const Text('Delete', style: TextStyle(color: Colors.red),),
             ),
@@ -108,44 +104,40 @@ class _CommentTileState extends State<CommentTile> {
     );
   }
 
-  // Method to handle the deletion of a comment
-  Future<void> handleDeleteComment(BuildContext context) async {
+  // Method to handle the deletion of a post
+  Future<void> handleDeletePost(BuildContext context) async {
     try {
-      await widget.commentServices.deleteComment(
-        postId: widget.postId,
-        commentId: widget.comment.id,
-      );
+      await widget.postServices.deletePost(widget.post.id);
       if (context.mounted) {
-        displayMessageToUser('Comment deleted successfully', context);
+        displayMessageToUser('Post deleted successfully', context);
       }
     } catch (e) {
       if (context.mounted) {
-        displayMessageToUser('Failed to delete comment: $e', context);
+        displayMessageToUser('Failed to delete post: $e', context);
       }
     }
   }
 
-  // Method to handle when the user would like to like or unlike the current comment
-  void handleLikeComment() async {
+  // Method to handle when the user would like to like or unlike the current post
+  void handleLikePost() async {
     try {
       if (isLiked) {
-        // if the user does like the current comment, call the unlike comment method
-        await widget.commentServices.unlikeComment(widget.postId, widget.comment.id);
+        // if the user does like the current post, call the unlike post method
+        await widget.postServices.unlikePost(widget.post.id);
         setState(() {
-          widget.comment.likes_count--;
+          widget.post.likes_count--;
           isLiked = false;
         });
       } else {
-        // if the user does not like the current comment, call the like comment method
-        await widget.commentServices.likeComment(widget.postId, widget.comment.id);
-
+        // if the user does not like the current post, call the like post method
+        await widget.postServices.likePost(widget.post.id);
         setState(() {
-          widget.comment.likes_count++;
+          widget.post.likes_count++;
           isLiked = true;
         });
       }
     } catch (e) {
-      displayMessageToUser('Failed to like/unlike comment: $e', context);
+      displayMessageToUser('Failed to like/unlike post: $e', context);
     }
   }
 
@@ -171,20 +163,20 @@ class _CommentTileState extends State<CommentTile> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => OtherUserProfile(userID: widget.commentUser.id),
+                            builder: (context) => OtherUserProfile(userID: widget.postUser.id),
                           ),
                         );
                       },
                       // Profile Image
                       child: CircleAvatar(
                         radius: 20,
-                        backgroundImage: widget.commentUser.profile_image_url.isNotEmpty
-                            ? NetworkImage(widget.commentUser.profile_image_url)
+                        backgroundImage: widget.postUser.profile_image_url.isNotEmpty
+                            ? NetworkImage(widget.postUser.profile_image_url)
                             : null,
                         onBackgroundImageError: (exception, stackTrace) {
                           print('Error loading profile image: $exception');
                         },
-                        child: widget.commentUser.profile_image_url.isEmpty
+                        child: widget.postUser.profile_image_url.isEmpty
                             ? const Icon(Icons.account_circle, size: 50)
                             : null,
                       ),
@@ -203,7 +195,7 @@ class _CommentTileState extends State<CommentTile> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => OtherUserProfile(userID: widget.commentUser.id),
+                                  builder: (context) => OtherUserProfile(userID: widget.postUser.id),
                                 ),
                               );
                             },
@@ -215,14 +207,14 @@ class _CommentTileState extends State<CommentTile> {
                                     TextSpan(
                                       children: [
                                         TextSpan(
-                                          text: '${widget.commentUser.name} ',
+                                          text: '${widget.postUser.name} ',
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
                                           ),
                                         ),
                                         TextSpan(
-                                          text: '@${widget.commentUser.username}',
+                                          text: '@${widget.postUser.username}',
                                           style: const TextStyle(
                                             fontWeight: FontWeight.normal,
                                             fontSize: 16,
@@ -235,12 +227,12 @@ class _CommentTileState extends State<CommentTile> {
                                 ),
                                 // Elapsed time
                                 Text(
-                                  getElapsedTime(widget.comment.timestamp),
+                                  getElapsedTime(widget.post.timestamp),
                                   style: const TextStyle(color: Colors.grey),
                                 ),
 
                                 // Conditional rendering of IconButton for editing/deleting
-                                if (widget.comment.userId == widget.currentUser.id)
+                                if (widget.post.userId == widget.currentUser.id)
                                   IconButton(
                                     icon: const Icon(Icons.more_vert),
                                     onPressed: () {
@@ -251,9 +243,9 @@ class _CommentTileState extends State<CommentTile> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          // Comment content
+                          // Post content
                           Text(
-                            widget.comment.content,
+                            widget.post.content,
                             style: const TextStyle(fontSize: 16),
                           ),
                           
@@ -265,15 +257,22 @@ class _CommentTileState extends State<CommentTile> {
                             children: [
                               Row(
                                 children: [
-                                  // display the like Icon if it is not the current user's comment
-                                  if (widget.comment.userId != widget.currentUser.id)
+                                  // display the like Icon if it is not the current user's post
+                                  if (widget.post.userId != widget.currentUser.id)
                                     IconButton(
                                       icon: isLiked ? const Icon(Icons.favorite) : const Icon(Icons.favorite_border),
-                                      onPressed: handleLikeComment,
+                                      onPressed: handleLikePost,
                                     ),
 
                                   // number of likes
-                                  Text('${widget.comment.likes_count} likes'),
+                                  Text('${widget.post.likes_count} likes'),
+                                ],
+                              ),
+
+                              Row(
+                                children: [
+                                  // number of comments
+                                  Text('${widget.post.comments_count} comments'),
                                 ],
                               ),
                             ],
@@ -285,10 +284,6 @@ class _CommentTileState extends State<CommentTile> {
                 ),
               ],
             ),
-          ),
-          Divider(
-            color: Colors.grey.shade200,
-            thickness: 1,
           ),
         ],
       ),

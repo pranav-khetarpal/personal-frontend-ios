@@ -179,6 +179,7 @@ class _FollowingFeedHomeState extends State<FollowingFeedHome> {
                             feedLoadTime: feedLoadTime,
                             currentUser: currentUser!,
                             postServices: postServices,
+                            allowCommentPageNavigation: true,
                           )
                           : const Center(child: CircularProgressIndicator());
                     },

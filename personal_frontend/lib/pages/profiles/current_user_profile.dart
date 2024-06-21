@@ -222,6 +222,7 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                               feedLoadTime: DateTime.now(),
                               currentUser: currentUser!,
                               postServices: postServices,
+                              allowCommentPageNavigation: true,
                             );
                           },
                         ),
