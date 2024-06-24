@@ -8,6 +8,7 @@ import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/services/image_services.dart';
 import 'package:personal_frontend/services/user_account_services.dart';
 import 'package:personal_frontend/services/user_interation_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -17,7 +18,7 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-    // variables for displaying the user's information
+  // variables for displaying the user's information
   late Future<UserModel> futureUser;
   UserModel? currentUser;
   bool isLoadingCurrentUser = true;
@@ -36,6 +37,34 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
     fetchCurrentUser(); // Fetch the current user's profile
+    showIntroMessage(); // Show intro message if it's the first time
+  }
+
+  // Method to show initial introductory messages to the user
+  Future<void> showIntroMessage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstTime = prefs.getBool('isFirstEditingProfle') ?? true;
+
+    if (isFirstTime) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Edit Public Information"),
+          content: const Text("This page will allow you to edit you profile picture, name, username, and bio."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Got it!"),
+            ),
+          ],
+        ),
+      );
+
+      // Set the flag to false so the intro message won't be shown again
+      await prefs.setBool('isFirstEditingProfle', false);
+    }
   }
 
   // fetch the current user's profile to display their information
@@ -80,9 +109,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         name: nameController.text, // the user's inputted name
         username: usernameController.text, // the user's inputted username
         bio: bioController.text, // the user's inputted bio
-        profile_image_url: currentUser!.profile_image_url,
-        following: currentUser!.following,
-        stockLists: currentUser!.stockLists,
+        profileImageUrl: currentUser!.profileImageUrl,
+        stockLists: currentUser!.stockLists, 
+        followersCount: currentUser!.followersCount, 
+        followingCount: currentUser!.followingCount,
       );
 
       // Send the updated data to the backend
@@ -132,17 +162,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     children: [
                       CircleAvatar(
                         radius: 50,
-                        backgroundImage: currentUser!.profile_image_url.isNotEmpty
-                            ? NetworkImage(currentUser!.profile_image_url)
+                        backgroundImage: currentUser!.profileImageUrl.isNotEmpty
+                            ? NetworkImage(currentUser!.profileImageUrl)
                             : null,
                         onBackgroundImageError: (exception, stackTrace) {
                           print('Error loading profile image: $exception');
                           setState(() {
                             // Fallback to default icon or image in case of an error
-                            currentUser!.profile_image_url = '';
+                            currentUser!.profileImageUrl = '';
                           });
                         },
-                        child: currentUser!.profile_image_url.isEmpty
+                        child: currentUser!.profileImageUrl.isEmpty
                             ? const Icon(Icons.account_circle, size: 50)
                             : null,
                       ),

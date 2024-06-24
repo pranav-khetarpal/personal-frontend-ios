@@ -58,12 +58,12 @@ class SettingsPage extends StatelessWidget {
                 try {
                   if (user != null) {
                     // Check if the profile image is not the default one
-                    if (user!.profile_image_url !=
+                    if (user!.profileImageUrl !=
                         'https://firebasestorage.googleapis.com/v0/b/personal-app-fe948.appspot.com/o/profile_images%2Fdefault_profile_image.jpg?alt=media&token=f33a9720-2010-41b4-a6d0-4ba450db2f99') {
                       try {
                         // Delete the profile image from Firebase Storage
                         await firebase_storage.FirebaseStorage.instance
-                            .refFromURL(user!.profile_image_url)
+                            .refFromURL(user!.profileImageUrl)
                             .delete();
                         print('Profile image deleted successfully');
                       } catch (e) {

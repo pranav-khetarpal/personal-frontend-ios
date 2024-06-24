@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_post_tile.dart';
 import 'package:personal_frontend/components/my_small_button.dart';
@@ -166,39 +165,71 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                               // Profile image
                               CircleAvatar(
                                 radius: 50,
-                                backgroundImage: currentUser!.profile_image_url.isNotEmpty
-                                    ? NetworkImage(currentUser!.profile_image_url)
+                                backgroundImage: currentUser!.profileImageUrl.isNotEmpty
+                                    ? NetworkImage(currentUser!.profileImageUrl)
                                     : null,
                                 onBackgroundImageError: (exception, stackTrace) {
                                   print('Error loading profile image: $exception');
                                   setState(() {
                                     // Fallback to default icon or image in case of an error
-                                    currentUser!.profile_image_url = '';
+                                    currentUser!.profileImageUrl = '';
                                   });
                                 },
-                                child: currentUser!.profile_image_url.isEmpty
+                                child: currentUser!.profileImageUrl.isEmpty
                                     ? const Icon(Icons.account_circle, size: 50)
                                     : null,
                               ),
 
-                              // const Icon(Icons.account_circle, size: 100), // Placeholder icon for user image
-                              
                               const SizedBox(height: 16),
-                  
-                              Text(currentUser!.name, style: const TextStyle(fontSize: 24)),
-                              Text('@${currentUser!.username}', style: const TextStyle(fontSize: 18, color: Colors.grey)),
 
-                              // The user's bio
+                              // Display username and bio
+                              Text(currentUser!.name, style: const TextStyle(fontSize: 24)),
+                              Text('@${currentUser!.username}', style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.primary)),
+                              const SizedBox(height: 8),
                               Text(currentUser!.bio, style: const TextStyle(fontSize: 20)),
-                  
-                              const SizedBox(height: 16,),
-                  
+
+                              const SizedBox(height: 16),
+
+                              // Display followers and following count
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(
+                                        '${currentUser!.followersCount}',
+                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                      ),
+                                      const Text(
+                                        'Followers',
+                                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(width: 24),
+                                  Column(
+                                    children: [
+                                      Text(
+                                        '${currentUser!.followingCount}',
+                                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                      ),
+                                      const Text(
+                                        'Following',
+                                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 16),
+
                               // Button to allow the user to edit their profile information
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   MySmallButton(
-                                    text: "Edit Profile", 
+                                    text: "Edit Profile",
                                     onTap: () {
                                       Navigator.of(context).push(
                                         MaterialPageRoute(builder: (context) => const EditProfilePage()),
@@ -217,8 +248,8 @@ class _CurrentUserProfileState extends State<CurrentUserProfileHome> {
                           itemBuilder: (context, index) {
                             PostModel post = posts[index];
                             return PostTile(
-                              post: post, 
-                              postUser: currentUser!, 
+                              post: post,
+                              postUser: currentUser!,
                               feedLoadTime: DateTime.now(),
                               currentUser: currentUser!,
                               postServices: postServices,

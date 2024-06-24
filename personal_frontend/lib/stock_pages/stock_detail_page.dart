@@ -1,7 +1,7 @@
-// frontend/lib/pages/stock_detail_page.dart
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/services/stock_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StockDetailPage extends StatefulWidget {
   final String symbol;
@@ -22,6 +22,34 @@ class _StockDetailPageState extends State<StockDetailPage> {
   void initState() {
     super.initState();
     fetchStockInfo();
+    showIntroMessage(); // Show intro message if it's the first time
+  }
+
+  // Method to display introductory startup messages
+  Future<void> showIntroMessage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstTime = prefs.getBool('isFirstTimeStockDetailPage') ?? true;
+
+    if (isFirstTime) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Stock Detail Information"),
+          content: const Text("This page displays common statistics about the stock you selected and provides information about its history."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Got it!"),
+            ),
+          ],
+        ),
+      );
+
+      // Set the flag to false so the intro message won't be shown again
+      await prefs.setBool('isFirstTimeStockDetailPage', false);
+    }
   }
 
   Future<void> fetchStockInfo() async {
@@ -62,7 +90,7 @@ class _StockDetailPageState extends State<StockDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stock Details: ${widget.symbol}'),
+        title: Text(widget.symbol, style: const TextStyle(fontWeight: FontWeight.bold),),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -77,15 +105,15 @@ class _StockDetailPageState extends State<StockDetailPage> {
                           'Current Price',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
-                            fontSize: 20,
-                          )
+                            fontSize: 16,
+                          ),
                         ),
                         Text(
                           '\$${formatNumber(stockInfo!["current_price"])}',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 30,
-                          )
+                            fontSize: 24,
+                          ),
                         ),
                         const SizedBox(height: 16.0),
                         Row(
@@ -122,8 +150,8 @@ class _StockDetailPageState extends State<StockDetailPage> {
                           'About',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 30,
-                          )
+                            fontSize: 24,
+                          ),
                         ),
                         const SizedBox(height: 8.0),
                         Text(
@@ -171,19 +199,22 @@ class _StockDetailPageState extends State<StockDetailPage> {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 20,
-            )
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 16,
+            ),
           ),
           Text(
             value,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.secondary,
-              fontSize: 30,
-            )
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+            ),
           ),
-          const SizedBox(height: 5)
+          const Divider(
+            color: Colors.grey,
+            height: 8,
+          ),
         ],
       ),
     );

@@ -5,6 +5,7 @@ import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/stock_model.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/services/stock_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateStockListPage extends StatefulWidget {
   final Map<String, List<String>> stockLists;
@@ -37,6 +38,55 @@ class _CreateStockListPageState extends State<CreateStockListPage> {
   // Object for using stockServices methods
   StockServices stockServices = StockServices();
 
+    @override
+  void initState() {
+    super.initState();
+    showIntroMessage(); // Show intro message if it's the first time
+  }
+
+  // Method to show initial introductory messages to the user
+  Future<void> showIntroMessage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstTime = prefs.getBool('isFirstTimeCreatingStockList') ?? true;
+
+    if (isFirstTime) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Create a Stock Sist"),
+          content: const Text("You can create a stock list by first giving it a name, and then searching for stocks to add to the list. "
+            "To remove a stock from the list, simply press the red X. You can also change the order of the stocks shown by dragging and dropping stocks."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Got it!"),
+            ),
+          ],
+        ),
+      );
+
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Save Changes"),
+          content: const Text("Press the check mark at the top right to save your new stock list."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Got it!"),
+            ),
+          ],
+        ),
+      );
+
+      // Set the flag to false so the intro message won't be shown again
+      await prefs.setBool('isFirstTimeCreatingStockList', false);
+    }
+  }
 
   @override
   void dispose() {

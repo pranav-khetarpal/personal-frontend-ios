@@ -56,6 +56,68 @@ class UserInteractionServices {
     }
   }
 
+  // // Handle the follow button press
+  // Future<void> followUser(String userIDToFollow, UserModel currentUser) async {
+  //   // Retrieve the Firebase token of the current logged-in user
+  //   String token = await authServices.getIdToken();
+
+  //   final String url = IPAddressAndRoutes.getRoute('followOtherUser');
+
+  //   try {
+  //     // Send HTTP POST request to constructed URL with the token for authorization
+  //     final response = await http.post(
+  //       Uri.parse(url),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': 'Bearer $token',
+  //       },
+  //       body: jsonEncode({'userIdToFollow': userIDToFollow}),
+  //     );
+
+  //     // Handling whether the response is valid from the status code
+  //     if (response.statusCode == 200) {
+  //       // Update the current logged-in user's following list
+  //       currentUser.following.add(userIDToFollow);
+  //     } else {
+  //       throw Exception('Failed to follow user: ${response.statusCode} ${response.reasonPhrase}');
+  //     }
+  //   } catch (e) {
+  //     // Catch any errors resulting from the HTTP request
+  //     throw Exception('An error occurred: $e');
+  //   }
+  // }
+
+  // // Handle the unfollow button press
+  // Future<void> unfollowUser(String userIDToUnfollow, UserModel currentUser) async {
+  //   // Retrieve the Firebase token of the current logged-in user
+  //   String token = await authServices.getIdToken();
+
+  //   final String url = IPAddressAndRoutes.getRoute('unfollowOtherUser');
+
+  //   try {
+  //     // Send HTTP POST request to constructed URL with the token for authorization
+  //     final response = await http.post(
+  //       Uri.parse(url),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': 'Bearer $token',
+  //       },
+  //       body: jsonEncode({'userIdToUnfollow': userIDToUnfollow}),
+  //     );
+
+  //     // Handling whether the response is valid from the status code
+  //     if (response.statusCode == 200) {
+  //       // Update the current logged-in user's following list
+  //       currentUser.following.remove(userIDToUnfollow);
+  //     } else {
+  //       throw Exception('Failed to unfollow user: ${response.statusCode} ${response.reasonPhrase}');
+  //     }
+  //   } catch (e) {
+  //     // Catch any errors resulting from the HTTP request
+  //     throw Exception('An error occurred: $e');
+  //   }
+  // }
+
   // Handle the follow button press
   Future<void> followUser(String userIDToFollow, UserModel currentUser) async {
     // Retrieve the Firebase token of the current logged-in user
@@ -75,10 +137,7 @@ class UserInteractionServices {
       );
 
       // Handling whether the response is valid from the status code
-      if (response.statusCode == 200) {
-        // Update the current logged-in user's following list
-        currentUser.following.add(userIDToFollow);
-      } else {
+      if (response.statusCode != 200) {
         throw Exception('Failed to follow user: ${response.statusCode} ${response.reasonPhrase}');
       }
     } catch (e) {
@@ -106,10 +165,7 @@ class UserInteractionServices {
       );
 
       // Handling whether the response is valid from the status code
-      if (response.statusCode == 200) {
-        // Update the current logged-in user's following list
-        currentUser.following.remove(userIDToUnfollow);
-      } else {
+      if (response.statusCode != 200) {
         throw Exception('Failed to unfollow user: ${response.statusCode} ${response.reasonPhrase}');
       }
     } catch (e) {
@@ -143,6 +199,28 @@ class UserInteractionServices {
     } catch (e) {
       // Catch any error occurring with the HTTP request
       throw Exception('Error searching users: $e');
+    }
+  }
+
+  // Method to see if a the current user is following another user in question
+  Future<bool> isFollowingUser(String targetUserId) async {
+    String token = await authServices.getIdToken();
+
+    final String baseUrl = IPAddressAndRoutes.getRoute('isFollowingUser');
+    final String url = '$baseUrl$targetUserId';
+
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return response.body == 'true';
+    } else {
+      throw Exception('Failed to check following status: ${response.statusCode} ${response.reasonPhrase}');
     }
   }
 }

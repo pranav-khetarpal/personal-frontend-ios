@@ -1,133 +1,11 @@
-// import 'package:flutter/material.dart';
-// import 'package:personal_frontend/components/my_user_tile.dart';
-// import 'package:personal_frontend/helper/helper_functions.dart';
-// import 'package:personal_frontend/models/user_model.dart';
-// import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
-// import 'package:personal_frontend/services/user_interation_services.dart';
-// import 'package:personal_frontend/components/my_rounded_textfield.dart';
-
-// // class needed to ensure bottom navigation bar is present in sub pages
-// class SearchUsers extends StatelessWidget {
-//   const SearchUsers({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const SearchUsersHome();
-//   }
-// }
-
-// class SearchUsersHome extends StatefulWidget {
-//   const SearchUsersHome({super.key});
-
-//   @override
-//   State<SearchUsersHome> createState() => _SearchUsersHomeState();
-// }
-
-// class _SearchUsersHomeState extends State<SearchUsersHome> {
-//   // List to hold the search results
-//   List<UserModel> searchResults = [];
-
-//   // Controller for the search text field
-//   final TextEditingController searchController = TextEditingController();
-
-//   // Object to use UserService methods
-//   final UserInteractionServices userService = UserInteractionServices();
-
-//   // Method to search for users by username
-//   Future<void> searchUsers(String query) async {
-//     try {
-//       int searchLimit = 10;
-//       final results = await userService.searchUsers(query, searchLimit);
-//       setState(() {
-//         searchResults = results;
-//       });
-//     } catch (e) {
-//       // Log the error and provide user feedback
-//       print('Error searching users: $e');
-//       displayMessageToUser('Error searching users: $e', context);
-//     }
-//   }
-
-//   // Method to navigate to the user profile page
-//   void navigateToUserProfile(BuildContext context, String userID) {
-//     Navigator.of(context).push(
-//       MaterialPageRoute(
-//         builder: (context) => OtherUserProfile(userID: userID), // Pass the userId to the profile page
-//       ),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Search Users'), // Title of the search page
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(25.0),
-//         child: Column(
-//           children: [
-//             // Row to hold the search text field and search button
-//             Row(
-//               children: [
-//                 // Use the MyTextField component
-//                 Expanded(
-//                   child: MyRoundedTextField(
-//                     hintText: 'Search by username',
-//                     controller: searchController,
-//                     maxLength: 15,
-//                     allowSpaces: false,
-//                   ),
-//                 ),
-//                 const SizedBox(width: 8), // Add some space between the text field and button
-//                 // Search button
-//                 IconButton(
-//                   icon: const Icon(Icons.search),
-//                   onPressed: () {
-//                     searchUsers(searchController.text); // Call the search method when the button is pressed
-//                   },
-//                 ),
-//               ],
-//             ),
-//             const SizedBox(height: 16), // Add some space between the input row and the search results
-//             // Display search results
-//             Expanded(
-//               child: ListView.builder(
-//                 itemCount: searchResults.length,
-//                 itemBuilder: (context, index) {
-//                   UserModel user = searchResults[index];
-//                   return UserTile(
-//                     user: user,
-//                     onTap: () => navigateToUserProfile(context, user.id), // Navigate to the user profile page on tap
-//                   );
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-import 'dart:async'; // Import the async library
-
+import 'dart:async'; 
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_user_tile.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/user_model.dart';
 import 'package:personal_frontend/pages/profiles/other_user_profile.dart';
 import 'package:personal_frontend/services/user_interation_services.dart';
-
-// Class needed to ensure bottom navigation bar is present in sub pages
-class SearchUsers extends StatelessWidget {
-  const SearchUsers({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const SearchUsersHome();
-  }
-}
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchUsersHome extends StatefulWidget {
   const SearchUsersHome({super.key});
@@ -148,11 +26,38 @@ class _SearchUsersHomeState extends State<SearchUsersHome> {
 
   // Object to use UserService methods
   final UserInteractionServices userService = UserInteractionServices();
-
+  
   @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
+  void initState() {
+    super.initState();
+    showIntroMessage(); // Show intro message if it's the first time
+  }
+
+  // Method to show initial introductory messages to the user
+  Future<void> showIntroMessage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstTime = prefs.getBool('isFirstTimeSearchUsers') ?? true;
+
+    if (isFirstTime) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Search Other Users"),
+          content: const Text("This is where you search other users by username. You may view their posts, and follow them."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Got it!"),
+            ),
+          ],
+        ),
+      );
+
+      // Set the flag to false so the intro message won't be shown again
+      await prefs.setBool('isFirstTimeSearchUsers', false);
+    }
   }
 
   // Method to search for users by username

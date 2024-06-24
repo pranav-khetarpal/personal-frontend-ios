@@ -178,13 +178,13 @@ class _CommentTileState extends State<CommentTile> {
                       // Profile Image
                       child: CircleAvatar(
                         radius: 20,
-                        backgroundImage: widget.commentUser.profile_image_url.isNotEmpty
-                            ? NetworkImage(widget.commentUser.profile_image_url)
+                        backgroundImage: widget.commentUser.profileImageUrl.isNotEmpty
+                            ? NetworkImage(widget.commentUser.profileImageUrl)
                             : null,
                         onBackgroundImageError: (exception, stackTrace) {
                           print('Error loading profile image: $exception');
                         },
-                        child: widget.commentUser.profile_image_url.isEmpty
+                        child: widget.commentUser.profileImageUrl.isEmpty
                             ? const Icon(Icons.account_circle, size: 50)
                             : null,
                       ),

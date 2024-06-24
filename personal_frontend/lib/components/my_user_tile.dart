@@ -16,13 +16,13 @@ class UserTile extends StatelessWidget {
       // Profile Image
       leading: CircleAvatar(
         radius: 20,
-        backgroundImage: user.profile_image_url.isNotEmpty
-            ? NetworkImage(user.profile_image_url)
+        backgroundImage: user.profileImageUrl.isNotEmpty
+            ? NetworkImage(user.profileImageUrl)
             : null,
         onBackgroundImageError: (exception, stackTrace) {
           print('Error loading profile image: $exception');
         },
-        child: user.profile_image_url.isEmpty
+        child: user.profileImageUrl.isEmpty
             ? const Icon(Icons.account_circle, size: 50)
             : null,
       ),

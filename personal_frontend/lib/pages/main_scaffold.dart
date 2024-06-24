@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:personal_frontend/pages/post_pages/add_post.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
 import 'package:personal_frontend/pages/following_feed.dart';
 import 'package:personal_frontend/pages/profiles/current_user_profile.dart';
 import 'package:personal_frontend/stock_pages/search_stocks.dart';
-import 'package:personal_frontend/pages/search_users.dart';
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -19,8 +17,8 @@ class _MainScaffoldState extends State<MainScaffold> {
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
-    GlobalKey<NavigatorState>(),
+    // GlobalKey<NavigatorState>(),
+    // GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
 
@@ -58,20 +56,20 @@ class _MainScaffoldState extends State<MainScaffold> {
                   return MaterialPageRoute(builder: (context) => const SearchStocks());
                 },
               ),
+              // Navigator(
+              //   key: _navigatorKeys[2],
+              //   onGenerateRoute: (routeSettings) {
+              //     return MaterialPageRoute(builder: (context) => const SearchUsers());
+              //   },
+              // ),
+              // Navigator(
+              //   key: _navigatorKeys[3],
+              //   onGenerateRoute: (routeSettings) {
+              //     return MaterialPageRoute(builder: (context) => const AddPost());
+              //   },
+              // ),
               Navigator(
                 key: _navigatorKeys[2],
-                onGenerateRoute: (routeSettings) {
-                  return MaterialPageRoute(builder: (context) => const SearchUsers());
-                },
-              ),
-              Navigator(
-                key: _navigatorKeys[3],
-                onGenerateRoute: (routeSettings) {
-                  return MaterialPageRoute(builder: (context) => const AddPost());
-                },
-              ),
-              Navigator(
-                key: _navigatorKeys[4],
                 onGenerateRoute: (routeSettings) {
                   return MaterialPageRoute(builder: (context) => const CurrentUserProfile());
                 },
@@ -110,20 +108,20 @@ class _MainScaffoldState extends State<MainScaffold> {
               ),
               label: '',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.search_sharp,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.add,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              label: '',
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(
+            //     Icons.search_sharp,
+            //     color: Theme.of(context).colorScheme.secondary,
+            //   ),
+            //   label: '',
+            // ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(
+            //     Icons.add,
+            //     color: Theme.of(context).colorScheme.secondary,
+            //   ),
+            //   label: '',
+            // ),
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.person,

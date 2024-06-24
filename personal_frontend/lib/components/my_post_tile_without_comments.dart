@@ -170,13 +170,13 @@ class _PostTileState extends State<PostTile> {
                       // Profile Image
                       child: CircleAvatar(
                         radius: 20,
-                        backgroundImage: widget.postUser.profile_image_url.isNotEmpty
-                            ? NetworkImage(widget.postUser.profile_image_url)
+                        backgroundImage: widget.postUser.profileImageUrl.isNotEmpty
+                            ? NetworkImage(widget.postUser.profileImageUrl)
                             : null,
                         onBackgroundImageError: (exception, stackTrace) {
                           print('Error loading profile image: $exception');
                         },
-                        child: widget.postUser.profile_image_url.isEmpty
+                        child: widget.postUser.profileImageUrl.isEmpty
                             ? const Icon(Icons.account_circle, size: 50)
                             : null,
                       ),
