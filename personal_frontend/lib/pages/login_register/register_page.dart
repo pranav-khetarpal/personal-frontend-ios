@@ -4,7 +4,7 @@ import 'package:personal_frontend/components/my_large_button.dart';
 import 'package:personal_frontend/components/my_square_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
-import 'package:personal_frontend/pages/main_scaffold.dart';
+import 'package:personal_frontend/pages/login_register/email_verification_page.dart';
 import 'package:personal_frontend/services/user_account_services.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -30,86 +30,80 @@ class _RegisterPageState extends State<RegisterPage> {
   // object for calling UserAccountServices methods
   final UserAccountServices userAccountServices = UserAccountServices();
 
-  // register method
+  // Register method
   Future<void> register() async {
-    // Make sure the passwords match
     if (passwordController.text != confirmPasswordController.text) {
-      displayMessageToUser("Passwords don't match", context);
+      if (mounted) {
+        displayMessageToUser("Passwords don't match", context);
+      }
       return;
     }
 
-    // Show a loading circle
     showDialog(
       context: context,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     UserCredential? userCredential;
     try {
-      // Check if the username is available
       bool usernameAvailable = await userAccountServices.isUsernameAvailable(usernameController.text);
       if (!usernameAvailable) {
-        displayMessageToUser("Username is already taken", context);
-        throw Exception('Username is already taken');
+        if (mounted) {
+          displayMessageToUser("Username is already taken", context);
+          throw Exception('Username is already taken');
+        }
       }
 
-      // Create the user in Firebase Authentication
       userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
-      // Create a user document in the backend
-      await userAccountServices.createUserDocument(
-        name: nameController.text,
-        email: emailController.text,
-        username: usernameController.text,
+      if (mounted) {
+        Navigator.pop(context); // Dismiss loading dialog
 
-        // INITIALLY, PASS THE BIO AS AN EMPTY STRING WHEN CREATING THE NEW USER
-        bio: "",
-      );
-
-      // Pop the loading circle
-      if (mounted) Navigator.pop(context);
-
-      // Navigate to the home page only if registration is successful
-      Future.microtask(() {
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MainScaffold()),
-          );
-        }
-      });
+        // Navigate to EmailVerificationPage with necessary user details
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => EmailVerificationPage(
+              user: userCredential!.user!,
+              name: nameController.text,
+              email: emailController.text,
+              username: usernameController.text,
+            ),
+          ),
+        );
+      }
 
     } on FirebaseAuthException catch (e) {
-      // Delete user's authentication credentials if user document creation fails
       if (userCredential != null) {
         await userCredential.user?.delete();
       }
 
-      // Pop the loading circle
-      if (mounted) Navigator.pop(context);
-      displayMessageToUser("Firebase Error: ${e.message}", context);
+      if (mounted) {
+        Navigator.pop(context); // Dismiss loading dialog
+        displayMessageToUser("Firebase Error: ${e.message}", context);
+      }
+
     } catch (e) {
-      // Pop the loading circle
       if (userCredential != null) {
         await userCredential.user?.delete();
       }
 
-      if (mounted) Navigator.pop(context);
-      displayMessageToUser("Error: $e", context);
+      if (mounted) {
+        Navigator.pop(context); // Dismiss loading dialog
+        displayMessageToUser("Error: $e", context);
+      }
+
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
     return BaseLayout(
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(25.0),

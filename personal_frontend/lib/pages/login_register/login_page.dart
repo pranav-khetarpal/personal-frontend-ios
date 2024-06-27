@@ -45,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
       // Ensure the widget is still mounted before popping the loading circle
       if (mounted) {
         Navigator.pop(context);
+        print("mounted");
 
         if (userDoc != null) {
           // Navigate to the home page
