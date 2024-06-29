@@ -3,31 +3,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/components/my_small_button.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
-import 'package:personal_frontend/pages/main_scaffold.dart';
-import 'package:personal_frontend/services/user_account_services.dart';
+import 'package:personal_frontend/pages/profiles/current_user_profile.dart';
 
-class EmailVerificationPage extends StatefulWidget {
+class NewEmailVerificationPage extends StatefulWidget {
   final User user;
-  final String name;
-  final String email;
-  final String username;
+  final String newEmail;
   final int verificationTimeoutMinutes; // Timeout duration in minutes
 
-  const EmailVerificationPage({
+  const NewEmailVerificationPage({
     super.key,
     required this.user,
-    required this.name,
-    required this.email,
-    required this.username,
+    required this.newEmail,
     this.verificationTimeoutMinutes = 1, // Default timeout of 1 minute
   });
 
   @override
-  State<EmailVerificationPage> createState() => _EmailVerificationPageState();
+  State<NewEmailVerificationPage> createState() => _NewEmailVerificationPageState();
 }
 
-class _EmailVerificationPageState extends State<EmailVerificationPage> {
-  late UserAccountServices userAccountServices;
+class _NewEmailVerificationPageState extends State<NewEmailVerificationPage> {
   bool isEmailVerified = false;
   late int _timeoutInSeconds;
   bool _timeoutOccurred = false;
@@ -36,18 +30,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
   @override
   void initState() {
-
-    print(widget.name);
-    print(widget.username);
-
-
     super.initState();
-    userAccountServices = UserAccountServices();
     isEmailVerified = widget.user.emailVerified;
     _timeoutInSeconds = widget.verificationTimeoutMinutes * 60;
-
-    print("Initial email verification status: $isEmailVerified");
-    print(_timeoutOccurred);
 
     // Start periodic reloads
     _startPeriodicReload();
@@ -68,9 +53,7 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
 
   void _startTimeoutTimer() {
     _timeoutTimer = Timer(Duration(seconds: _timeoutInSeconds), () {
-      print("Timeout occurred");
       if (!isEmailVerified) {
-        print("Verification timed out");
         setState(() {
           _timeoutOccurred = true;
         });
@@ -87,11 +70,9 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   }
 
   Future<void> _reloadUser() async {
-    print("Reloading user...");
     await widget.user.reload();
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && user.emailVerified) {
-      print("User reloaded, emailVerified: ${user.emailVerified}");
       setState(() {
         isEmailVerified = true;
       });
@@ -101,24 +82,14 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   }
 
   void _handleEmailVerified() async {
-
-    print(widget.name);
-    print(widget.username);
-
-
-    await userAccountServices.createUserDocument(
-      name: widget.name,
-      email: widget.email,
-      username: widget.username,
-      bio: "", // Initially empty
-    );
-    _navigateToMainScaffold();
+    displayMessageToUser("Email verification successful.", context);
+    _navigateToProfilePage();
   }
 
-  void _navigateToMainScaffold() {
+  void _navigateToProfilePage() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const MainScaffold()),
+      MaterialPageRoute(builder: (context) => const CurrentUserProfile()),
     );
   }
 
@@ -143,7 +114,6 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
     try {
       await widget.user.sendEmailVerification();
     } catch (e) {
-      print("Error sending verification email: $e");
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("Error sending verification email: $e"),
       ));
@@ -153,12 +123,12 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Verify Email')),
+      appBar: AppBar(title: const Text('Verify New Email')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Please verify your email to continue.'),
+            const Text('Please verify your new email to continue.'),
             const SizedBox(height: 16),
             MySmallButton(text: 'Resend Verification Email', onTap: _resendVerificationEmail),
             if (_timeoutOccurred) ...[

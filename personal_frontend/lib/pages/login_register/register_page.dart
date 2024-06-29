@@ -4,7 +4,7 @@ import 'package:personal_frontend/components/my_large_button.dart';
 import 'package:personal_frontend/components/my_square_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
-import 'package:personal_frontend/pages/login_register/email_verification_page.dart';
+import 'package:personal_frontend/authorization/email_verification_page.dart';
 import 'package:personal_frontend/services/user_account_services.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -30,11 +30,90 @@ class _RegisterPageState extends State<RegisterPage> {
   // object for calling UserAccountServices methods
   final UserAccountServices userAccountServices = UserAccountServices();
 
+  // // Register method
+  // Future<void> register() async {
+  //   if (passwordController.text != confirmPasswordController.text) {
+  //     if (mounted) {
+  //       displayMessageToUser("Passwords don't match", context);
+  //     }
+  //     return;
+  //   }
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => const Center(child: CircularProgressIndicator()),
+  //   );
+
+  //   UserCredential? userCredential;
+  //   try {
+  //     bool usernameAvailable = await userAccountServices.isUsernameAvailable(usernameController.text);
+  //     if (!usernameAvailable) {
+  //       if (mounted) {
+  //         displayMessageToUser("Username is already taken", context);
+  //         throw Exception('Username is already taken');
+  //       }
+  //     }
+
+  //     userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //       email: emailController.text,
+  //       password: passwordController.text,
+  //     );
+
+  //     if (mounted) {
+  //       Navigator.pop(context); // Dismiss loading dialog
+
+  //       // Navigate to EmailVerificationPage with necessary user details
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => EmailVerificationPage(
+  //             user: userCredential!.user!,
+  //             name: nameController.text,
+  //             email: emailController.text,
+  //             username: usernameController.text,
+  //           ),
+  //         ),
+  //       );
+  //     }
+
+  //   } on FirebaseAuthException catch (e) {
+  //     if (userCredential != null) {
+  //       await userCredential.user?.delete();
+  //     }
+
+  //     if (mounted) {
+  //       Navigator.pop(context); // Dismiss loading dialog
+  //       displayMessageToUser("Firebase Error: ${e.message}", context);
+  //     }
+
+  //   } catch (e) {
+  //     if (userCredential != null) {
+  //       await userCredential.user?.delete();
+  //     }
+
+  //     if (mounted) {
+  //       Navigator.pop(context); // Dismiss loading dialog
+  //       displayMessageToUser("Error: $e", context);
+  //     }
+
+  //   }
+  // }
+
   // Register method
   Future<void> register() async {
-    if (passwordController.text != confirmPasswordController.text) {
+    String password = passwordController.text.trim();
+    String confirmPassword = confirmPasswordController.text.trim();
+
+    if (password != confirmPassword) {
       if (mounted) {
         displayMessageToUser("Passwords don't match", context);
+      }
+      return;
+    }
+
+    if (!isPasswordStrong(password)) {
+      if (mounted) {
+        displayMessageToUser("Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a digit, and a special character.", context);
       }
       return;
     }
@@ -56,7 +135,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
-        password: passwordController.text,
+        password: password,
       );
 
       if (mounted) {
@@ -98,6 +177,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

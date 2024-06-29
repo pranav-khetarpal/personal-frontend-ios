@@ -66,3 +66,20 @@ class MessageDialogContent extends StatelessWidget {
     );
   }
 }
+
+// Method to ensure a user created password meets strength requirements
+bool isPasswordStrong(String password) {
+  // Define the regex patterns
+  final lengthPattern = RegExp(r'^.{8,}$'); // At least 8 characters
+  final upperCasePattern = RegExp(r'^(?=.*[A-Z])'); // At least one uppercase letter
+  final lowerCasePattern = RegExp(r'^(?=.*[a-z])'); // At least one lowercase letter
+  final digitPattern = RegExp(r'^(?=.*\d)'); // At least one digit
+  // final specialCharacterPattern = RegExp(r'^(?=.*[@$!%*?&])'); // At least one special character
+
+  // Check if password matches all patterns
+  return lengthPattern.hasMatch(password) &&
+         upperCasePattern.hasMatch(password) &&
+         lowerCasePattern.hasMatch(password) &&
+         digitPattern.hasMatch(password);
+        //  specialCharacterPattern.hasMatch(password);
+}

@@ -31,7 +31,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:personal_frontend/authorization/login_or_register.dart';
-import 'package:personal_frontend/pages/login_register/email_verification_page.dart';
+import 'package:personal_frontend/authorization/email_verification_page.dart';
 import 'package:personal_frontend/pages/main_scaffold.dart';
 
 class AuthPage extends StatelessWidget {

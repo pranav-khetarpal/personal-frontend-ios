@@ -4,6 +4,7 @@ import 'package:personal_frontend/components/my_large_button.dart';
 import 'package:personal_frontend/components/my_square_textfield.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/pages/base_layout.dart';
+import 'package:personal_frontend/authorization/forgot_password_page.dart';
 import 'package:personal_frontend/pages/main_scaffold.dart';
 import 'package:personal_frontend/services/user_interation_services.dart';
 
@@ -25,8 +26,84 @@ class _LoginPageState extends State<LoginPage> {
 
   final UserInteractionServices userServices = UserInteractionServices();
 
+  // // Login method
+  // Future<void> login() async {
+
+  //   print(mounted);
+
+  //   // Show loading circle
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => const Center(
+  //       child: CircularProgressIndicator(),
+  //     ),
+  //   );
+
+  //   print(mounted);
+
+  //   try {
+
+  //     print(mounted);
+
+  //     UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+  //       email: emailController.text,
+  //       password: passwordController.text,
+  //     );
+
+  //     print(mounted);
+
+  //     final userDoc = await userServices.fetchUserProfile(userCredential.user!.uid);
+
+  //     print(mounted);
+
+  //     // Ensure the widget is still mounted before popping the loading circle
+  //     if (mounted) {
+  //       Navigator.pop(context);
+
+  //       print(mounted);
+
+  //       if (userDoc != null) {
+  //         // Navigate to the home page
+  //         Future.microtask(() {
+  //           if (mounted) {
+  //             Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (context) => const MainScaffold(),
+  //               ),
+  //             );
+  //           }
+  //         });
+  //       } else {
+  //         // User document doesn't exist, log out and show error
+  //         await FirebaseAuth.instance.signOut();
+
+  //         // Display error message
+  //         displayMessageToUser("User profile not found. Please register.", context);
+  //       }
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     // Ensure the widget is still mounted before popping the loading circle
+  //     if (mounted) {
+  //       Navigator.pop(context);
+
+  //       // Display error message
+  //       displayMessageToUser(e.message ?? "Authentication failed", context);
+  //     }
+  //   } catch (e) {
+  //     // Ensure the widget is still mounted before popping the loading circle
+  //     if (mounted) {
+  //       Navigator.pop(context);
+
+  //       // Display general error message
+  //       displayMessageToUser("An error occurred. Please try again.", context);
+  //     }
+  //   }
+  // }
+
+  // Login method
   Future<void> login() async {
-    // Show loading circle
+    // Show loading dialog
     showDialog(
       context: context,
       builder: (context) => const Center(
@@ -35,30 +112,28 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     try {
+      
+      // Sign in user
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
-      final userDoc = await userServices.fetchUserProfile(userCredential.user!.uid);
+      // // Fetch user profile
+      // final userDoc = await userServices.fetchUserProfile(userCredential.user!.uid);
 
-      // Ensure the widget is still mounted before popping the loading circle
+      // Ensure the widget is still mounted before popping the loading dialog
       if (mounted) {
-        Navigator.pop(context);
-        print("mounted");
+        Navigator.pop(context); // Close loading dialog
 
-        if (userDoc != null) {
+        if (await userServices.fetchUserProfile((userCredential.user!.uid)) != null) {
           // Navigate to the home page
-          Future.microtask(() {
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MainScaffold(),
-                ),
-              );
-            }
-          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MainScaffold(),
+            ),
+          );
         } else {
           // User document doesn't exist, log out and show error
           await FirebaseAuth.instance.signOut();
@@ -68,23 +143,24 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
     } on FirebaseAuthException catch (e) {
-      // Ensure the widget is still mounted before popping the loading circle
+      // Ensure the widget is still mounted before popping the loading dialog
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context); // Close loading dialog
 
         // Display error message
         displayMessageToUser(e.message ?? "Authentication failed", context);
       }
     } catch (e) {
-      // Ensure the widget is still mounted before popping the loading circle
+      // Ensure the widget is still mounted before popping the loading dialog
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context); // Close loading dialog
 
         // Display general error message
         displayMessageToUser("An error occurred. Please try again.", context);
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -132,10 +208,27 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      "Forgot Password?",
-                      style: TextStyle(color: Theme.of(context).colorScheme.primary),
+
+                    // Inside your LoginPage build method
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ForgotPasswordPage()),
+                        );
+                      },
+                      child: Text(
+                        "Forgot Password?",
+                        style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                      ),
                     ),
+
+
+                    // Text(
+                    //   "Forgot Password?",
+                    //   style: TextStyle(color: Theme.of(context).colorScheme.primary),
+                    // ),
+
                   ],
                 ),
                 const SizedBox(height: 25),
