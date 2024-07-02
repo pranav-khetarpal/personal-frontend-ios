@@ -111,25 +111,6 @@ class _PostAndCommentsPageState extends State<PostAndCommentsPage> {
     }
   }
 
-
-  // // Method to add a comment
-  // Future<void> addComment() async {
-  //   if (commentController.text.isEmpty) return;
-
-  //   try {
-  //     await commentServices.submitComment(
-  //       postId: widget.post.id,
-  //       content: commentController.text,
-  //     );
-  //     setState(() {
-  //       comments.add(commentController.text);
-  //       commentController.clear();
-  //     });
-  //   } catch (e) {
-  //     print('Error occurred while adding comment: $e');
-  //   }
-  // }
-
     // Method to add a comment
   Future<void> addComment() async {
     if (commentController.text.isEmpty) return;
@@ -140,19 +121,7 @@ class _PostAndCommentsPageState extends State<PostAndCommentsPage> {
         content: commentController.text,
       );
 
-      // // Assuming the backend returns the created comment with its ID and user info
-      // // You might need to adapt this part based on your actual backend response
-      // CommentModel newComment = CommentModel(
-      //   id: 'newly_created_comment_id', // Replace with actual ID
-      //   userId: widget.currentUser.id,
-      //   content: commentController.text,
-      //   timestamp: DateTime.now(),
-
-      // );
-
       setState(() {
-        // comments.add(newComment);
-        // commentUsers[widget.currentUser.id] = widget.currentUser;
         refreshComments();
         commentController.clear();
       });

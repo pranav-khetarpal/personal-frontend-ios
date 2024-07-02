@@ -256,156 +256,176 @@ class _SearchStocksHomeState extends State<SearchStocksHome> {
     }
   }
 
+  // Method to refresh the entire content of the page
+  Future<void> _refreshPage() async {
+    await fetchIndexPrices();
+    await fetchUserStockLists();
+  }
+
+  // Method to navigate to the create stock list page, and properly update when a new stock list is created
+  Future<void> _navigateToCreateStockListPage() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => CreateStockListPage(
+        stockLists: stockLists,
+        currentUser: currentUser,
+      )),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        stockLists[result['listName']] = result['stocks'];
+        expandedStockLists[result['listName']] = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search The Market'), // Title of the search page
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(25.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Index Prices Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: indexPrices.keys.map((ticker) {
-                  return GestureDetector(
-                    onTap: () => navigateToStockDetail(context, ticker),
-                    child: Column(
-                      children: [
-                        Text(
-                          ticker,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          indexPrices[ticker]?.toStringAsFixed(2) ?? '-',
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Search input field
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: searchController,
-                      decoration: const InputDecoration(
-                        hintText: 'Search for a stock...',
+      body: RefreshIndicator(
+        onRefresh: _refreshPage,
+        child: Padding(
+          padding: const EdgeInsets.all(25.0),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Index Prices Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: indexPrices.keys.map((ticker) {
+                    return GestureDetector(
+                      onTap: () => navigateToStockDetail(context, ticker),
+                      child: Column(
+                        children: [
+                          Text(
+                            ticker,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            indexPrices[ticker]?.toStringAsFixed(2) ?? '-',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
                       ),
-                      onChanged: onSearchChanged, // Call the onSearchChanged method when the text changes
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16), // Add some space between the input row and the search results
+                    );
+                  }).toList(),
+                ),
 
-              // Display search results
-              if (searchResults.isNotEmpty)
-                ListView.builder(
+                const SizedBox(height: 16),
+
+                // Search input field
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                        decoration: const InputDecoration(
+                          hintText: 'Search for a stock...',
+                        ),
+                        onChanged: onSearchChanged, // Call the onSearchChanged method when the text changes
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16), // Add some space between the input row and the search results
+
+                // Display search results
+                if (searchResults.isNotEmpty)
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: searchResults.length,
+                    itemBuilder: (context, index) {
+                      StockModel stock = searchResults[index];
+                      return StockTile(
+                        stock: stock,
+                        onTap: () => navigateToStockDetail(context, stock.symbol),
+                      );
+                    },
+                  ),
+
+                const SizedBox(height: 16), // Add space before the stock lists
+
+                // Display the user's stock lists
+                ListView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: searchResults.length,
-                  itemBuilder: (context, index) {
-                    StockModel stock = searchResults[index];
-                    return StockTile(
-                      stock: stock,
-                      onTap: () => navigateToStockDetail(context, stock.symbol),
-                    );
-                  },
-                ),
-
-              const SizedBox(height: 16), // Add space before the stock lists
-
-              // Display the user's stock lists
-              ListView(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: stockLists.keys.map((listName) {
-                  return ExpansionTile(
-                    title: Row(
-                      children: [
-                        // button to edit and delete the list
-                        IconButton(
-                          icon: const Icon(Icons.more_vert), // You can use any icon
-                          onPressed: () {
-                            // allow the user to edit or delete their given list
-                            showEditDeleteDialog(context, listName);
-                          },
-                        ),
-
-                        // stock list name
-                        Text(
-                          listName,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    initiallyExpanded: expandedStockLists[listName]!,
-                    onExpansionChanged: (_) => toggleStockListExpansion(listName),
-                    children: stockLists[listName]!.map((ticker) {
-                      double? price = stockListPrices[listName]?[ticker];
-                      return StockTile(
-                        stock: StockModel(name: ticker, symbol: "", price: price ?? 0.0),
-                        onTap: () => navigateToStockDetail(context, ticker),
-                      );
-                    }).toList(),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Button to allow the user to create a new list
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => CreateStockListPage(
-                      stockLists: stockLists,
-                      currentUser: currentUser,
-                    )),
-                  );
-                },
-                child: Container(
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add_box_sharp, size: 40, color: Theme.of(context).colorScheme.primary,),
-
-                        const SizedBox(width: 10,),
-
-                        // Add a new stock list text
-                        Text(
-                          "Create a new list",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Theme.of(context).colorScheme.secondary,
+                  children: stockLists.keys.map((listName) {
+                    return ExpansionTile(
+                      title: Row(
+                        children: [
+                          // button to edit and delete the list
+                          IconButton(
+                            icon: const Icon(Icons.more_vert), // You can use any icon
+                            onPressed: () {
+                              // allow the user to edit or delete their given list
+                              showEditDeleteDialog(context, listName);
+                            },
                           ),
-                        ),
-                      ],
+
+                          // stock list name
+                          Text(
+                            listName,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      initiallyExpanded: expandedStockLists[listName]!,
+                      onExpansionChanged: (_) => toggleStockListExpansion(listName),
+                      children: stockLists[listName]!.map((ticker) {
+                        double? price = stockListPrices[listName]?[ticker];
+                        return StockTile(
+                          stock: StockModel(name: ticker, symbol: "", price: price ?? 0.0),
+                          onTap: () => navigateToStockDetail(context, ticker),
+                        );
+                      }).toList(),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Button to allow the user to create a new list
+                GestureDetector(
+                  onTap: _navigateToCreateStockListPage,
+                  child: Container(
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
+                    child: Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_box_sharp, size: 40, color: Theme.of(context).colorScheme.primary,),
+
+                          const SizedBox(width: 10,),
+
+                          // Add a new stock list text
+                          Text(
+                            "Create a new list",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 16),
-            ],
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),

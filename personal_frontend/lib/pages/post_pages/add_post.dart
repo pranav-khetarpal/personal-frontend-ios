@@ -1,18 +1,9 @@
 // import 'package:flutter/material.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:personal_frontend/components/my_large_button.dart';
 // import 'package:personal_frontend/components/my_expandable_textfield.dart';
 // import 'package:personal_frontend/helper/helper_functions.dart';
 // import 'package:personal_frontend/services/post_services.dart';
-
-// // // class needed to ensure bottom navigation bar is present in sub pages
-// // class AddPost extends StatelessWidget {
-// //   const AddPost({super.key});
-
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return const AddPostHome();
-// //   }
-// // }
 
 // class AddPostHome extends StatefulWidget {
 //   const AddPostHome({super.key});
@@ -25,9 +16,42 @@
 //   final TextEditingController postController = TextEditingController();
 //   bool isLoading = false;
 
-//   // object to use PostServices methods
+//   // Object to use PostServices methods
 //   final PostServices postServices = PostServices();
 
+//   @override
+//   void initState() {
+//     super.initState();
+//     showIntroMessage(); // Show intro message if it's the first time
+//   }
+
+//   Future<void> showIntroMessage() async {
+//     SharedPreferences prefs = await SharedPreferences.getInstance();
+//     bool isFirstTime = prefs.getBool('isFirstTimeAddPost') ?? true;
+
+//     if (isFirstTime) {
+//       await showDialog(
+//         context: context,
+//         builder: (context) => AlertDialog(
+//           title: const Text("Create a Post"),
+//           content: const Text("This is where you can create a new post. Your post will be visible to other users in the app."),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop();
+//               },
+//               child: const Text("Got it!"),
+//             ),
+//           ],
+//         ),
+//       );
+
+//       // Set the flag to false so the intro message won't be shown again
+//       await prefs.setBool('isFirstTimeAddPost', false);
+//     }
+//   }
+
+//   // Method to handle the submission of a post
 //   Future<void> submitPost() async {
 //     try {
 //       setState(() {
@@ -61,7 +85,7 @@
 //       setState(() {
 //         isLoading = false;
 //       });
-      
+
 //       print('Error occurred while submitting post: $e');
 
 //       displayMessageToUser('Failed to submit post: $e', context);
@@ -98,7 +122,9 @@
 //   }
 // }
 
+
 import 'package:flutter/material.dart';
+import 'package:personal_frontend/pages/following_feed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:personal_frontend/components/my_large_button.dart';
 import 'package:personal_frontend/components/my_expandable_textfield.dart';
@@ -173,13 +199,20 @@ class _AddPostState extends State<AddPostHome> {
         content: content,
       );
 
-      displayMessageToUser('Post created successfully', context);
+      displayMessageToUser('Post created successfully, and you have automatically liked your post.', context);
 
       setState(() {
         isLoading = false;
       });
 
       postController.clear();
+
+      // Navigate back to the FollowingFeed page
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const FollowingFeed()),
+        (Route<dynamic> route) => false,
+      );
 
     } catch (e) {
       setState(() {

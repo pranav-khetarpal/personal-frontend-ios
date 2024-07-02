@@ -160,7 +160,11 @@ class _CreateStockListPageState extends State<CreateStockListPage> {
       displayMessageToUser('Stock list created successfully', context);
 
       // Optionally, you can navigate back after creating
-      Navigator.of(context).pop();
+      // Navigator.of(context).pop();
+      Navigator.of(context).pop({
+        'listName': stockListNameController.text.trim(),
+        'stocks': localStocks,
+      });
     } catch (e) {
       // Log error and provide feedback to user
       print('Error creating stock list: $e');

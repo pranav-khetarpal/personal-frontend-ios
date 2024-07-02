@@ -6,7 +6,8 @@ class IPAddressAndRoutes {
   // static String ip_address = 'http://127.0.0.1:8000';
 
   // String of IP address on home wifi
-  static String ipAddress = 'http://10.0.0.32:8000';
+  // static String ipAddress = 'http://10.0.0.32:8000';
+  static String ipAddress = 'https://fastapi-backend-k7o2wx2eva-uc.a.run.app';
 
   // map to make retrieving routes easier when needed
   static Map<String, String> routes = {
