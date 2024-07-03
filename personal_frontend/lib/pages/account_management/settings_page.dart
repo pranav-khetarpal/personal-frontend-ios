@@ -6,6 +6,11 @@ import 'package:personal_frontend/authorization/login_or_register.dart';
 import 'package:personal_frontend/components/my_small_button.dart';
 import 'package:personal_frontend/helper/helper_functions.dart';
 import 'package:personal_frontend/models/user_model.dart';
+import 'package:personal_frontend/pages/account_management/cookies_policy_page.dart';
+import 'package:personal_frontend/pages/account_management/end_user_liscence_agreement_page.dart';
+import 'package:personal_frontend/pages/account_management/privacy_policy_page.dart';
+import 'package:personal_frontend/pages/account_management/terms_and_conditions_app.dart';
+import 'package:personal_frontend/pages/account_management/terms_and_conditions_web.dart';
 import 'package:personal_frontend/services/authorization_services.dart';
 import 'package:personal_frontend/services/user_account_services.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -167,6 +172,61 @@ class SettingsPage extends StatelessWidget {
               MySmallButton(
                 text: "Delete Account", 
                 onTap: () => showDeleteAccountDialog(context),
+              ),
+
+              const SizedBox(height: 10,),
+
+              MySmallButton(
+                text: "Privacy Policy", 
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 10,),
+
+              MySmallButton(
+                text: "Terms and Conditions for Website", 
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const TermsAndConditionsWeb()),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 10,),
+
+              MySmallButton(
+                text: "Terms and Conditions for App", 
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const TermsAndConditionsApp()),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 10,),
+
+              MySmallButton(
+                text: "Cookies Policy for Website", 
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const CookiesPolicyPage()),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 10,),
+
+              MySmallButton(
+                text: "End User Liscence Agreement", 
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => const EndUserLiscenceAgreementPage()),
+                  );
+                },
               ),
             ],
           ),
